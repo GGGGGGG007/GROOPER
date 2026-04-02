@@ -7,165 +7,173 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <title>드럼몬스터 견적앱</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --bg:#f5f4f1;--surface:#ffffff;--border:#e0ddd6;--border2:#ccc9c0;
-    --text:#1a1a1a;--text2:#555;--text3:#999;
-    --green:#1a7a5e;--green-light:#e8f5f0;--green-mid:#2a9d7a;
-    --red:#c0392b;--red-light:#fdf0ee;
-    --blue:#1a5fa8;--blue-light:#eaf1fb;
-    --accent:#2c2c2c;--radius:10px;--radius-sm:6px;
-  }
-  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f4f1;--surface:#fff;--border:#e0ddd6;--border2:#ccc9c0;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --green:#1a7a5e;--green-light:#e8f5f0;--green-mid:#2a9d7a;
+  --red:#c0392b;--red-light:#fdf0ee;
+  --blue:#1a5fa8;--blue-light:#eaf1fb;
+  --accent:#2c2c2c;--radius:10px;--radius-sm:6px;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
 
-  /* ── TOP NAV ── */
-  .nav{background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;position:sticky;top:0;z-index:100;}
-  .nav-title{font-size:15px;font-weight:700;letter-spacing:0.03em;}
-  .nav-tabs{display:flex;gap:4px;}
-  .nav-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.6);transition:all 0.15s;}
-  .nav-tab.active{background:rgba(255,255,255,0.18);color:#fff;}
+/* NAV */
+.nav{background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:52px;position:sticky;top:0;z-index:100;}
+.nav-title{font-size:14px;font-weight:700;letter-spacing:0.03em;white-space:nowrap;}
+.nav-tabs{display:flex;gap:3px;}
+.nav-tab{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.6);transition:all 0.15s;white-space:nowrap;}
+.nav-tab.active{background:rgba(255,255,255,0.18);color:#fff;}
 
-  /* ── VIEWS ── */
-  .view{display:none;padding:14px;max-width:900px;margin:0 auto;}
-  .view.active{display:block;}
+/* VIEWS */
+.view{display:none;padding:12px;max-width:900px;margin:0 auto;}
+.view.active{display:block;}
 
-  /* ── CARDS ── */
-  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
-  .card-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid var(--border);}
+/* CARDS */
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid var(--border);}
 
-  /* ── INPUTS ── */
-  input[type=text],input[type=number],input[type=tel],input[type=date],select,textarea{
-    font-family:inherit;font-size:13px;padding:8px 10px;border-radius:var(--radius-sm);
-    border:0.5px solid var(--border2);background:#fff;color:var(--text);width:100%;
-    -webkit-appearance:none;
-  }
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);}
-  textarea{resize:vertical;min-height:60px;}
+/* INPUTS */
+input[type=text],input[type=number],input[type=tel],input[type=date],select,textarea{
+  font-family:inherit;font-size:13px;padding:8px 10px;border-radius:var(--radius-sm);
+  border:0.5px solid var(--border2);background:#fff;color:var(--text);width:100%;-webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);}
+textarea{resize:vertical;min-height:60px;}
 
-  /* ── BUTTONS ── */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:#fff;color:var(--text);font-family:inherit;transition:all 0.12s;}
-  .btn:hover{background:var(--bg);}
-  .btn:active{transform:scale(0.98);}
-  .btn.primary{background:var(--green);color:#fff;border-color:transparent;}
-  .btn.primary:hover{background:var(--green-mid);}
-  .btn.danger{background:var(--red-light);color:var(--red);border-color:transparent;}
-  .btn.full{width:100%;}
-  .btn.sm{padding:6px 10px;font-size:12px;}
-  .btn.icon{width:28px;height:28px;padding:0;border-radius:50%;flex-shrink:0;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:#fff;color:var(--text);font-family:inherit;transition:all 0.12s;}
+.btn:active{transform:scale(0.97);}
+.btn.primary{background:var(--green);color:#fff;border-color:transparent;}
+.btn.primary:hover{background:var(--green-mid);}
+.btn.full{width:100%;}
+.btn.sm{padding:5px 10px;font-size:12px;}
+.btn.icon{width:28px;height:28px;padding:0;border-radius:50%;flex-shrink:0;}
 
-  /* ── MODE TABS ── */
-  .mode-tabs{display:flex;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;}
-  .mode-tab{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text3);border-right:0.5px solid var(--border);font-family:inherit;transition:all 0.12s;}
-  .mode-tab:last-child{border-right:none;}
-  .mode-tab.active{background:var(--accent);color:#fff;}
+/* MODE TABS */
+.mode-tabs{display:flex;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;}
+.mode-tab{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text3);border-right:0.5px solid var(--border);font-family:inherit;}
+.mode-tab:last-child{border-right:none;}
+.mode-tab.active{background:var(--accent);color:#fff;}
 
-  /* ── CAT TABS ── */
-  .cat-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
-  .cat-tabs{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
-  .cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);background:#fff;cursor:pointer;white-space:nowrap;color:var(--text2);font-family:inherit;transition:all 0.12s;}
-  .cat-tab.active{background:var(--accent);color:#fff;border-color:transparent;}
+/* CAT TABS */
+.cat-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.cat-tabs{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
+.cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);background:#fff;cursor:pointer;white-space:nowrap;color:var(--text2);font-family:inherit;}
+.cat-tab.active{background:var(--accent);color:#fff;border-color:transparent;}
 
-  /* ── PRODUCT GRID ── */
-  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-bottom:12px;}
-  .pcard{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;cursor:pointer;user-select:none;transition:border-color 0.12s;}
-  .pcard:hover{border-color:var(--border2);}
-  .pcard.sel{border:1.5px solid var(--green);background:var(--green-light);}
-  .pcard.sel .pname{color:#0a4a35;}
-  .pname{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.35;}
-  .pbrand{font-size:10px;color:var(--text3);margin-bottom:4px;}
-  .pprice{font-size:12px;color:var(--text2);}
-  .pcost{font-size:10px;color:var(--text3);}
-  .qty-row{display:flex;align-items:center;gap:6px;margin-top:7px;}
-  .qbtn{width:24px;height:24px;border-radius:50%;border:0.5px solid var(--border2);background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text);line-height:1;}
-  .qnum{font-size:13px;font-weight:700;min-width:18px;text-align:center;}
+/* PRODUCT GRID */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-bottom:12px;}
+.pcard{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;cursor:pointer;user-select:none;text-align:center;}
+.pcard:hover{border-color:var(--border2);}
+.pcard.sel{border:1.5px solid var(--green);background:var(--green-light);}
+.pcard.sel .pname{color:#0a4a35;}
+.pname{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.35;text-align:center;}
+.pbrand{font-size:10px;color:var(--text3);margin-bottom:4px;text-align:center;}
+.pprice{font-size:12px;color:var(--text2);text-align:center;}
+.pcost{font-size:10px;color:var(--text3);text-align:center;}
+.qty-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:7px;}
+.qbtn{width:24px;height:24px;border-radius:50%;border:0.5px solid var(--border2);background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text);line-height:1;}
+.qnum{font-size:13px;font-weight:700;min-width:18px;text-align:center;}
 
-  /* ── SUMMARY ── */
-  .sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
-  .sum-row:last-of-type{border-bottom:none;}
-  .sum-label{color:var(--text2);flex:1;padding-right:8px;}
-  .sum-qty{color:var(--text3);width:30px;text-align:center;font-size:12px;}
-  .sum-price{font-weight:500;text-align:right;min-width:80px;}
-  .divider{border-top:1px solid var(--border2);margin:8px 0;}
-  .total-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
-  .stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
-  .stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;}
-  .slabel{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
-  .sval{font-size:15px;font-weight:700;}
-  .sval.green{color:var(--green);}
-  .sval.red{color:var(--red);}
-  .sval.blue{color:var(--blue);}
+/* PRESET */
+.preset-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.preset-row{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
+.preset-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--green);background:var(--green-light);cursor:pointer;white-space:nowrap;color:var(--green);font-family:inherit;}
+.preset-btn:hover{background:var(--green);color:#fff;}
 
-  /* ── ADJ ITEMS ── */
-  .adj-item{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
-  .adj-item input[type=text]{flex:1;}
-  .adj-item select{width:80px;flex-shrink:0;}
-  .adj-item input[type=number]{width:90px;flex-shrink:0;}
-  .add-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);border:0.5px dashed var(--border2);background:transparent;cursor:pointer;color:var(--text3);font-size:12px;width:100%;margin-top:4px;font-family:inherit;}
-  .add-btn:hover{background:var(--bg);}
+/* SUMMARY */
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
+.sum-label{color:var(--text2);flex:1;padding-right:8px;}
+.sum-qty{color:var(--text3);width:30px;text-align:center;font-size:12px;}
+.sum-price{font-weight:500;text-align:right;min-width:80px;}
+.divider{border-top:1px solid var(--border2);margin:8px 0;}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+.stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;}
+.slabel{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+.sval{font-size:15px;font-weight:700;}
+.sval.green{color:var(--green);}
+.sval.red{color:var(--red);}
+.sval.blue{color:var(--blue);}
 
-  /* ── MANAGE TABLE ── */
-  .manage-table{width:100%;border-collapse:collapse;font-size:12px;}
-  .manage-table th{font-size:11px;color:var(--text3);font-weight:500;padding:6px 6px;border-bottom:0.5px solid var(--border2);text-align:left;}
-  .manage-table td{padding:4px 4px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
-  .manage-table tr:last-child td{border-bottom:none;}
-  .manage-table input{font-size:12px;padding:4px 6px;border-radius:4px;border:0.5px solid var(--border2);}
-  .manage-table input:focus{border-color:var(--green);}
-  .tbl-wrap{overflow-x:auto;}
+/* ADJ */
+.adj-item{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.adj-item input[type=text]{flex:1;}
+.adj-item select{width:80px;flex-shrink:0;}
+.adj-item input[type=number]{width:90px;flex-shrink:0;}
+.add-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);border:0.5px dashed var(--border2);background:transparent;cursor:pointer;color:var(--text3);font-size:12px;width:100%;margin-top:4px;font-family:inherit;}
+.add-btn:hover{background:var(--bg);}
 
-  /* ── CAT MANAGE ── */
-  .cat-manage-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:0.5px solid var(--border);background:#fff;}
-  .cat-manage-row:last-child{border-bottom:none;}
-  .cat-manage-row input{flex:1;font-size:13px;}
+/* ACTION */
+.action-row{display:flex;gap:8px;margin-top:10px;}
+.action-row .btn{flex:1;}
 
-  /* ── ACTION ROW ── */
-  .action-row{display:flex;gap:8px;margin-top:10px;}
-  .action-row .btn{flex:1;}
+/* MANAGE TABLE */
+.manage-table{width:100%;border-collapse:collapse;font-size:12px;}
+.manage-table th{font-size:11px;color:var(--text3);font-weight:500;padding:6px;border-bottom:0.5px solid var(--border2);text-align:left;}
+.manage-table td{padding:4px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+.manage-table tr:last-child td{border-bottom:none;}
+.manage-table input{font-size:12px;padding:4px 6px;border-radius:4px;border:0.5px solid var(--border2);}
+.manage-table input:focus{border-color:var(--green);}
+.tbl-wrap{overflow-x:auto;}
 
-  /* ── PRINT / QUOTE PREVIEW ── */
-  .quote-preview{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+/* CAT MANAGE */
+.cat-manage-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:0.5px solid var(--border);background:#fff;}
+.cat-manage-row:last-child{border-bottom:none;}
+.cat-manage-row input{flex:1;font-size:13px;}
 
-  /* ────────────────────────────
-     PRINT STYLES
-  ──────────────────────────── */
-  @media print {
-    body{background:#fff;font-size:11pt;}
-    .nav,.view:not(#printView),.no-print{display:none!important;}
-    #printView{display:block!important;padding:0;}
-    .print-page{padding:16mm 14mm;max-width:none;}
-  }
+/* ── COMPARE VIEW ── */
+.compare-outer{position:relative;overflow:hidden;}
+.compare-track{display:flex;transition:transform 0.3s ease;}
+.compare-slide{min-width:100%;padding:4px 2px;}
+.compare-dots{display:flex;justify-content:center;gap:8px;margin:10px 0 4px;}
+.compare-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);cursor:pointer;border:none;padding:0;}
+.compare-dot.active{background:var(--accent);}
+.plan-tabs{display:flex;gap:0;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;}
+.plan-tab{flex:1;padding:8px 4px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text3);border-right:0.5px solid var(--border);font-family:inherit;}
+.plan-tab:last-child{border-right:none;}
+.plan-tab.active{background:var(--accent);color:#fff;}
+.plan-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:var(--green-light);color:var(--green);margin-bottom:6px;}
 
-  /* ── PRINT PAGE ── */
-  .print-page{padding:20px;}
+/* ────────────────────────────
+   PRINT STYLES
+──────────────────────────── */
+@media print {
+  body{background:#fff;}
+  .nav,.view:not(#printView),.no-print{display:none!important;}
+  #printView{display:block!important;padding:0;}
+  .print-page{padding:12mm 14mm;max-width:none;}
+  .items-table th{background:#2c2c2c!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .items-table tr:nth-child(even) td{background:#f9f8f5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .receiver-table .rtlabel{background:#f0efe9!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
 
-  .quote-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
-  .quote-header-left h1{font-size:22px;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin-bottom:4px;}
-  .quote-header-left .q-date{font-size:12px;color:var(--text2);}
+/* PRINT PAGE */
+.print-page{padding:20px;}
+.quote-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.quote-header-left h1{font-size:36px;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:4px;}
+.quote-header-left .q-date{font-size:13px;color:var(--text2);}
+.company-box{text-align:right;font-size:13px;color:var(--text2);line-height:1.9;}
+.company-box .company-name{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:2px;}
+.receiver-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;}
+.receiver-table td{padding:5px 8px;border:0.5px solid #aaa;}
+.receiver-table .rtlabel{background:#f0efe9;color:var(--text2);font-weight:500;width:70px;white-space:nowrap;}
+.receiver-table .rttotal{font-size:15px;font-weight:700;color:var(--accent);}
+.items-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
+.items-table th{background:#2c2c2c;color:#fff;padding:7px 8px;font-weight:500;font-size:11px;text-align:center;}
+.items-table th.text-left{text-align:center;}
+.items-table td{padding:6px 8px;border-bottom:0.5px solid #ddd;vertical-align:middle;text-align:center;}
+.items-table tr:nth-child(even) td{background:#f9f8f5;}
+.items-table .text-right{text-align:center;}
+.items-table .text-center{text-align:center;}
+.quote-footer-note{font-size:11px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:8px;margin-top:4px;}
 
-  .company-box{text-align:right;font-size:11px;color:var(--text2);line-height:1.7;}
-  .company-box .company-name{font-size:14px;font-weight:700;color:var(--accent);}
-
-  .receiver-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;}
-  .receiver-table td{padding:5px 8px;border:0.5px solid #aaa;}
-  .receiver-table .rtlabel{background:#f0efe9;color:var(--text2);font-weight:500;width:70px;white-space:nowrap;}
-  .receiver-table .rttotal{font-size:15px;font-weight:700;color:var(--accent);}
-
-  .items-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
-  .items-table th{background:#2c2c2c;color:#fff;padding:7px 8px;font-weight:500;font-size:11px;}
-  .items-table td{padding:6px 8px;border-bottom:0.5px solid #ddd;vertical-align:middle;}
-  .items-table tr:nth-child(even) td{background:#f9f8f5;}
-  .items-table .text-right{text-align:right;}
-  .items-table .text-center{text-align:center;}
-
-  .quote-footer-note{font-size:11px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:8px;margin-top:4px;}
-
-  /* ── RESPONSIVE ── */
-  @media(max-width:480px){
-    .product-grid{grid-template-columns:repeat(2,1fr);}
-    .stat-grid{grid-template-columns:repeat(3,1fr);}
-    .nav-title{font-size:13px;}
-    .nav-tab{padding:5px 10px;font-size:11px;}
-  }
+@media(max-width:480px){
+  .product-grid{grid-template-columns:repeat(2,1fr);}
+  .stat-grid{grid-template-columns:repeat(3,1fr);}
+}
 </style>
 </head>
 <body>
@@ -174,65 +182,45 @@
   <div class="nav-title">🥁 드럼몬스터</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTop('quote')">견적</button>
+    <button class="nav-tab" onclick="switchTop('compare')">비교</button>
     <button class="nav-tab" onclick="switchTop('manage')">상품관리</button>
+    <button class="nav-tab" onclick="switchTop('presetmanage')">프리셋</button>
     <button class="nav-tab" onclick="switchTop('catmanage')">카테고리</button>
   </div>
 </nav>
 
-<!-- ═══════════════════════════════ QUOTE VIEW ═══════════════════════════════ -->
+<!-- ═══ QUOTE VIEW ═══ -->
 <div class="view active" id="quoteView">
-
   <div class="mode-tabs">
     <button class="mode-tab active" onclick="switchMode('retail')">소매 견적</button>
     <button class="mode-tab" onclick="switchMode('wholesale')">도매 견적</button>
   </div>
 
-  <!-- 수신처 정보 -->
   <div class="card">
     <div class="card-title">수신처 정보</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">거래처명</div>
-        <input type="text" id="custCompany" placeholder="상호명"/>
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">담당자</div>
-        <input type="text" id="custName" placeholder="담당자명"/>
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">연락처</div>
-        <input type="tel" id="custPhone" placeholder="010-0000-0000"/>
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">발행일</div>
-        <input type="date" id="quoteDate"/>
-      </div>
-      <div style="grid-column:1/-1;">
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">주소</div>
-        <input type="text" id="custAddr" placeholder="주소 (선택)"/>
-      </div>
-      <div style="grid-column:1/-1;">
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">비고</div>
-        <textarea id="custNote" placeholder="특이사항, 배송 요청 등"></textarea>
-      </div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">거래처명</div><input type="text" id="custCompany" placeholder="상호명"/></div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">담당자</div><input type="text" id="custName" placeholder="담당자명"/></div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">연락처</div><input type="tel" id="custPhone" placeholder="010-0000-0000"/></div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">발행일</div><input type="date" id="quoteDate"/></div>
+      <div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">주소</div><input type="text" id="custAddr" placeholder="주소 (선택)"/></div>
+      <div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;">비고</div><textarea id="custNote" placeholder="특이사항, 배송 요청 등"></textarea></div>
     </div>
   </div>
 
-  <!-- 상품 선택 -->
   <div class="card">
     <div class="card-title">상품 선택</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">프리셋</div>
+    <div class="preset-scroll"><div class="preset-row" id="presetRow"></div></div>
     <div class="cat-scroll"><div class="cat-tabs" id="catTabs"></div></div>
     <div id="productArea"></div>
   </div>
 
-  <!-- 견적 내역 -->
   <div class="card">
     <div class="card-title">견적 내역</div>
     <div id="summaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div></div>
-
-    <!-- 소매 옵션 -->
     <div id="retailOptions">
-      <div style="height:10px;"></div>
+      <div style="height:8px;"></div>
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">추가 항목</div>
       <div id="adjList"></div>
       <button class="add-btn" onclick="addAdj()">+ 항목 추가 (카드수수료·출장비 등)</button>
@@ -242,17 +230,14 @@
         <span style="font-size:13px;color:var(--text2);">%</span>
       </div>
     </div>
-
-    <!-- 도매 옵션 -->
     <div id="wholesaleOptions" style="display:none;">
-      <div style="height:10px;"></div>
+      <div style="height:8px;"></div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="font-size:13px;color:var(--text2);">원가에</span>
         <input type="number" id="wholesaleMargin" value="12" min="0" max="100" style="width:65px;" oninput="renderProducts();renderSummary()"/>
         <span style="font-size:13px;color:var(--text2);">% 추가</span>
       </div>
     </div>
-
     <div class="divider"></div>
     <div class="total-row">
       <span style="font-size:15px;font-weight:700;">최종 금액</span>
@@ -271,7 +256,41 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════ MANAGE VIEW ═══════════════════════════════ -->
+<!-- ═══ COMPARE VIEW ═══ -->
+<div class="view" id="compareView">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:14px;font-weight:700;">견적 비교 (A~E안)</span>
+      <button class="btn sm" onclick="clearAllPlans()">전체 초기화</button>
+    </div>
+    <div class="plan-tabs" id="planTabs"></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;" id="planModeLabel"></div>
+    <div class="cat-scroll"><div class="cat-tabs" id="compareCatTabs"></div></div>
+    <div id="compareProductArea"></div>
+    <div style="margin-top:8px;">
+      <div id="compareSummaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div></div>
+      <div class="divider"></div>
+      <div class="total-row">
+        <span style="font-size:14px;font-weight:700;">합계</span>
+        <span style="font-size:18px;font-weight:700;color:var(--green);" id="compareTotal">₩0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;">전체 안 비교</div>
+    <div class="compare-outer" id="compareOuter">
+      <div class="compare-track" id="compareTrack"></div>
+    </div>
+    <div class="compare-dots" id="compareDots"></div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn full" onclick="slideCompare(-1)">← 이전</button>
+      <button class="btn full" onclick="slideCompare(1)">다음 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MANAGE VIEW ═══ -->
 <div class="view" id="manageView">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -288,7 +307,32 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════ CAT MANAGE VIEW ═══════════════════════════════ -->
+<!-- ═══ PRESET MANAGE VIEW ═══ -->
+<div class="view" id="presetmanageView">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:14px;font-weight:700;">프리셋 편집</span>
+      <span id="presetSaveBadge" style="font-size:11px;color:var(--green);background:var(--green-light);border-radius:4px;padding:2px 8px;display:none;">저장됨</span>
+    </div>
+    <div class="cat-scroll" style="margin-bottom:10px;"><div class="cat-tabs" id="presetEditTabs"></div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--text3);white-space:nowrap;">프리셋 이름</span>
+      <input type="text" id="presetNameInput" placeholder="프리셋 이름" style="flex:1;" oninput="updatePresetName(this.value)"/>
+      <button class="btn sm" style="background:var(--red-light);color:var(--red);border:none;white-space:nowrap;" onclick="deletePreset()">삭제</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">포함할 상품 선택</div>
+    <div class="cat-scroll"><div class="cat-tabs" id="presetCatTabs"></div></div>
+    <div id="presetProductArea"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;">현재 구성</div>
+    <div id="presetCurrentItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0;">선택된 상품 없음</div></div>
+    <div class="action-row" style="margin-top:12px;">
+      <button class="btn" onclick="addPreset()">+ 새 프리셋 추가</button>
+      <button class="btn primary" onclick="savePresets()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CAT MANAGE VIEW ═══ -->
 <div class="view" id="catmanageView">
   <div class="card">
     <div style="font-size:14px;font-weight:700;margin-bottom:12px;">카테고리 편집</div>
@@ -300,10 +344,9 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════ PRINT VIEW ═══════════════════════════════ -->
+<!-- ═══ PRINT VIEW ═══ -->
 <div class="view" id="printView">
   <div class="print-page" id="printContent">
-
     <div class="quote-header">
       <div class="quote-header-left">
         <h1>견 적 서</h1>
@@ -317,31 +360,26 @@
         <div>업태: 도소매 / 종목: 악기</div>
       </div>
     </div>
-
     <div style="font-size:12px;margin-bottom:8px;">아래와 같이 견적합니다.</div>
-
     <table class="receiver-table" id="receiverTable"></table>
-
     <table class="items-table">
       <thead>
         <tr>
           <th style="width:5%">No.</th>
-          <th style="width:25%">브랜드</th>
-          <th style="width:35%">상품명</th>
-          <th style="width:8%" class="text-center">수량</th>
-          <th style="width:12%" class="text-right">단가</th>
-          <th style="width:15%" class="text-right">공급가액</th>
+          <th class="text-left" style="width:20%">브랜드</th>
+          <th class="text-left" style="width:38%">상품명</th>
+          <th style="width:8%">수량</th>
+          <th style="width:13%">단가</th>
+          <th style="width:16%">공급가액</th>
         </tr>
       </thead>
       <tbody id="printItems"></tbody>
       <tfoot id="printFoot"></tfoot>
     </table>
-
     <div class="quote-footer-note">본 견적서는 영수증 용도로도 사용이 가능합니다.</div>
     <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="printNote"></div>
   </div>
-
-  <div class="no-print" style="padding:0 14px 14px;max-width:900px;margin:0 auto;">
+  <div class="no-print" style="padding:0 12px 14px;max-width:900px;margin:0 auto;">
     <div class="action-row">
       <button class="btn" onclick="switchTop('quote')">← 돌아가기</button>
       <button class="btn primary" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
@@ -350,17 +388,13 @@
 </div>
 
 <script>
-/* ══════════════════ DATA ══════════════════ */
-const DEFAULT_CATS = [
-  {id:'drum',label:'드럼 본체'},
-  {id:'cymbal',label:'심벌'},
-  {id:'hardware',label:'하드웨어'},
-  {id:'chair',label:'의자'},
-  {id:'stick',label:'스틱·말렛'},
-  {id:'accessory',label:'악세사리'},
+/* ══ DEFAULT DATA ══ */
+const DEFAULT_CATS=[
+  {id:'drum',label:'드럼 본체'},{id:'cymbal',label:'심벌'},
+  {id:'hardware',label:'하드웨어'},{id:'chair',label:'의자'},
+  {id:'stick',label:'스틱·말렛'},{id:'accessory',label:'악세사리'},
 ];
-
-const DEFAULT_PRODUCTS = {
+const DEFAULT_PRODUCTS={
   drum:[
     {id:'d1',name:'Mapex Mars 5pc',brand:'Mapex',price:890000,cost:620000},
     {id:'d2',name:'Pearl Export 5pc',brand:'Pearl',price:750000,cost:510000},
@@ -409,38 +443,49 @@ const DEFAULT_PRODUCTS = {
   ],
 };
 
-/* ══════════════════ STATE ══════════════════ */
-function load(key,def){try{const r=localStorage.getItem(key);return r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){return JSON.parse(JSON.stringify(def));}}
-function save(key,data){try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}}
+/* 프리셋: 상품 id 배열로 구성 */
+const DEFAULT_PRESETS=[
+  {label:'입문용',ids:['d2','c4','h1','ch1','s1']},
+  {label:'중급용',ids:['d3','c1','h2','ch3','s2']},
+  {label:'프로용',ids:['d4','c2','h6','ch2','s2']},
+];
 
-let CATS = load('dm_cats', DEFAULT_CATS);
-let PRODUCTS = load('dm_products', DEFAULT_PRODUCTS);
-let selected = {};
-let currentCat = CATS[0]?.id || 'drum';
-let currentManageCat = CATS[0]?.id || 'drum';
-let quoteMode = 'retail';
-let adjItems = [];
-let editBuffer = {};
-let catEditBuffer = [];
+/* ══ STATE ══ */
+function load(k,d){try{const r=localStorage.getItem(k);return r?JSON.parse(r):JSON.parse(JSON.stringify(d));}catch(e){return JSON.parse(JSON.stringify(d));}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
-/* ══════════════════ UTILS ══════════════════ */
+let CATS=load('dm_cats',DEFAULT_CATS);
+let PRODUCTS=load('dm_products',DEFAULT_PRODUCTS);
+let PRESETS=load('dm_presets',DEFAULT_PRESETS);
+
+let selected={}, currentCat=CATS[0]?.id||'drum', quoteMode='retail', adjItems=[];
+let editBuffer={}, catEditBuffer=[];
+
+/* 비교 안 A~E */
+const PLAN_LABELS=['A','B','C','D','E'];
+let plans=PLAN_LABELS.map(l=>({label:l,selected:{}}));
+let currentPlan=0, compareCat=CATS[0]?.id||'drum', compareSlide=0;
+
+/* ══ UTILS ══ */
 function fmt(v){return '₩'+Math.round(v).toLocaleString('ko-KR');}
 function pct(v){return (Math.round(v*10)/10)+'%';}
 function todayStr(){const d=new Date();return d.toISOString().slice(0,10);}
 function fmtDateKo(s){if(!s)return '';const[y,m,d]=s.split('-');return y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';}
+function findP(id){for(const c of Object.values(PRODUCTS)){const p=c.find(x=>x.id===id);if(p)return p;}}
 
-/* ══════════════════ TOP NAV ══════════════════ */
+/* ══ TOP NAV ══ */
 function switchTop(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach((b,i)=>{
-    b.classList.toggle('active',['quote','manage','catmanage','print'].indexOf(v)===i||(v==='print'&&i===0));
-  });
-  document.getElementById(v+'View').classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['quote','compare','manage','presetmanage','catmanage'].indexOf(v)===i));
+  const el=document.getElementById(v+'View');
+  if(el)el.classList.add('active');
   if(v==='manage'){editBuffer=JSON.parse(JSON.stringify(PRODUCTS));renderManage();}
   if(v==='catmanage'){catEditBuffer=JSON.parse(JSON.stringify(CATS));renderCatManage();}
+  if(v==='presetmanage'){presetEditBuffer=JSON.parse(JSON.stringify(PRESETS));currentEditPreset=0;renderPresetManage();}
+  if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();}
 }
 
-/* ══════════════════ MODE ══════════════════ */
+/* ══ MODE ══ */
 function switchMode(m){
   quoteMode=m;
   document.querySelectorAll('.mode-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&m==='retail')||(i===1&&m==='wholesale')));
@@ -449,27 +494,38 @@ function switchMode(m){
   renderProducts();renderSummary();
 }
 
-/* ══════════════════ CAT TABS ══════════════════ */
-function renderCatTabs(containerId, current, clickFn){
-  const el=document.getElementById(containerId);
-  if(!el)return;
+/* ══ CAT TABS ══ */
+function renderCatTabs(containerId,current,clickFn){
+  const el=document.getElementById(containerId);if(!el)return;
   el.innerHTML=CATS.map(c=>`<button class="cat-tab${c.id===current?' active':''}" onclick="${clickFn}('${c.id}')">${c.label}</button>`).join('');
 }
-
 function switchCat(id){currentCat=id;renderCatTabs('catTabs',currentCat,'switchCat');renderProducts();}
 
-/* ══════════════════ PRODUCTS ══════════════════ */
+/* ══ PRESETS ══ */
+function renderPresets(){
+  document.getElementById('presetRow').innerHTML=PRESETS.map((p,i)=>
+    `<button class="preset-btn" onclick="applyPreset(${i})">${p.label}</button>`
+  ).join('');
+}
+function applyPreset(i){
+  const preset=PRESETS[i];
+  selected={};
+  preset.ids.forEach(id=>{const p=findP(id);if(p)selected[id]={...p,qty:1};});
+  renderProducts();renderSummary();
+}
+
+/* ══ PRODUCTS ══ */
 function renderProducts(){
   renderCatTabs('catTabs',currentCat,'switchCat');
-  const prods=(PRODUCTS[currentCat]||[]);
+  const prods=PRODUCTS[currentCat]||[];
   const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   document.getElementById('productArea').innerHTML=`<div class="product-grid">${prods.map(p=>{
     const sel=selected[p.id];
-    const unitPrice=quoteMode==='wholesale'?Math.round((p.cost||0)*(1+margin/100)):p.price;
+    const up=quoteMode==='wholesale'?Math.round((p.cost||0)*(1+margin/100)):p.price;
     return `<div class="pcard${sel?' sel':''}" onclick="toggleP('${p.id}')">
       <div class="pname">${p.name}</div>
       <div class="pbrand">${p.brand}</div>
-      <div class="pprice">${quoteMode==='wholesale'?'도매: ':'소매: '}${fmt(unitPrice)}</div>
+      <div class="pprice">${quoteMode==='wholesale'?'도매: ':'소매: '}${fmt(up)}</div>
       ${quoteMode==='retail'&&p.cost?`<div class="pcost">원가: ${fmt(p.cost)}</div>`:''}
       ${sel?`<div class="qty-row" onclick="event.stopPropagation()">
         <button class="qbtn" onclick="chgQty('${p.id}',-1)">−</button>
@@ -479,24 +535,20 @@ function renderProducts(){
     </div>`;
   }).join('')}</div>`;
 }
-
 function toggleP(id){
   const p=findP(id);if(!p)return;
-  if(selected[id])delete selected[id];
-  else selected[id]={...p,qty:1};
+  if(selected[id])delete selected[id];else selected[id]={...p,qty:1};
   renderProducts();renderSummary();
 }
 function chgQty(id,d){
-  if(!selected[id])return;
-  selected[id].qty=Math.max(1,selected[id].qty+d);
+  if(!selected[id])return;selected[id].qty=Math.max(1,selected[id].qty+d);
   renderProducts();renderSummary();
 }
-function findP(id){for(const c of Object.values(PRODUCTS)){const p=c.find(x=>x.id===id);if(p)return p;}}
 
-/* ══════════════════ ADJ ITEMS ══════════════════ */
+/* ══ ADJ ══ */
 function addAdj(){adjItems.push({label:'카드수수료',type:'minus',value:0});renderAdjList();renderSummary();}
 function removeAdj(i){adjItems.splice(i,1);renderAdjList();renderSummary();}
-function updateAdj(i,field,val){adjItems[i][field]=field==='value'?parseFloat(val)||0:val;renderSummary();}
+function updateAdj(i,f,v){adjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderSummary();}
 function renderAdjList(){
   const el=document.getElementById('adjList');if(!el)return;
   el.innerHTML=adjItems.map((a,i)=>`
@@ -511,56 +563,47 @@ function renderAdjList(){
     </div>`).join('');
 }
 
-/* ══════════════════ SUMMARY ══════════════════ */
+/* ══ SUMMARY ══ */
+function calcTotal(selObj){
+  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
+  let subtotal=0,totalCost=0;
+  Object.values(selObj).forEach(it=>{
+    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
+    subtotal+=up*it.qty;totalCost+=(it.cost||0)*it.qty;
+  });
+  return{subtotal,totalCost};
+}
 function renderSummary(){
   const items=Object.values(selected);
   const el=document.getElementById('summaryItems');if(!el)return;
   const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   let subtotal=0,totalCost=0;
-
   if(!items.length){
     el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div>';
   } else {
     el.innerHTML=items.map(it=>{
       const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-      const lp=up*it.qty;const lc=(it.cost||0)*it.qty;
-      subtotal+=lp;totalCost+=lc;
+      const lp=up*it.qty;subtotal+=lp;totalCost+=(it.cost||0)*it.qty;
       return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;
     }).join('');
   }
-
-  // recalc totals after loop
-  totalCost=0;
-  items.forEach(it=>{totalCost+=(it.cost||0)*it.qty;});
-
+  totalCost=0;items.forEach(it=>{totalCost+=(it.cost||0)*it.qty;});
   let adjTotal=0;
-  if(quoteMode==='retail'){
-    const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
-    const discAmt=Math.round(subtotal*discPct/100);
-    adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-    const final=Math.max(0,subtotal-discAmt+adjTotal);
-    const profit=final-totalCost;
-    document.getElementById('totalPrice').textContent=fmt(final);
-    document.getElementById('statCost').textContent=fmt(totalCost);
-    const pEl=document.getElementById('statProfit');
-    pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
-    const mEl=document.getElementById('statMargin');
-    const rate=final>0?profit/final*100:0;
-    mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
-  } else {
-    const final=subtotal;
-    const profit=final-totalCost;
-    document.getElementById('totalPrice').textContent=fmt(final);
-    document.getElementById('statCost').textContent=fmt(totalCost);
-    const pEl=document.getElementById('statProfit');
-    pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
-    const mEl=document.getElementById('statMargin');
-    const rate=final>0?profit/final*100:0;
-    mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
-  }
+  const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
+  const discAmt=Math.round(subtotal*discPct/100);
+  if(quoteMode==='retail') adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
+  const final=Math.max(0,subtotal-discAmt+adjTotal);
+  const profit=final-totalCost;
+  const rate=final>0?profit/final*100:0;
+  document.getElementById('totalPrice').textContent=fmt(final);
+  document.getElementById('statCost').textContent=fmt(totalCost);
+  const pEl=document.getElementById('statProfit');
+  pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
+  const mEl=document.getElementById('statMargin');
+  mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
 }
 
-/* ══════════════════ RESET ══════════════════ */
+/* ══ RESET ══ */
 function resetAll(){
   selected={};adjItems=[];
   ['custCompany','custName','custPhone','custAddr','custNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -569,7 +612,7 @@ function resetAll(){
   renderAdjList();renderProducts();renderSummary();
 }
 
-/* ══════════════════ COPY TEXT ══════════════════ */
+/* ══ COPY TEXT ══ */
 function buildText(){
   const company=document.getElementById('custCompany')?.value||'';
   const name=document.getElementById('custName')?.value||'고객';
@@ -592,7 +635,7 @@ function buildText(){
   if(company)txt+=`거래처: ${company}\n`;
   txt+=`담당자: ${name}`;if(phone)txt+=` / ${phone}`;txt+=`\n━━━━━━━━━━━━━━\n${lines}`;
   if(discPct>0||adjLines){txt+=`━━━━━━━━━━━━━━\n소계: ${fmt(subtotal)}\n`;if(discPct>0)txt+=`할인(${discPct}%): -${fmt(discAmt)}\n`;if(adjLines)txt+=adjLines;}
-  txt+=`━━━━━━━━━━━━━━\n합계: ${fmt(final)}\n\n드럼몬스터 / 한정수\n031)000-0000`;
+  txt+=`━━━━━━━━━━━━━━\n합계: ${fmt(final)}\n\n드럼몬스터 / 한정수`;
   return txt;
 }
 function copyText(){
@@ -600,7 +643,7 @@ function copyText(){
   navigator.clipboard.writeText(txt).then(()=>alert('복사 완료!\n카카오톡에 붙여넣기 하세요.')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('복사 완료!');});
 }
 
-/* ══════════════════ PRINT ══════════════════ */
+/* ══ PRINT ══ */
 function showPrint(){
   const company=document.getElementById('custCompany')?.value||'';
   const name=document.getElementById('custName')?.value||'';
@@ -611,69 +654,117 @@ function showPrint(){
   const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   const items=Object.values(selected);
   const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
-
   document.getElementById('printDate').textContent='발행일: '+fmtDateKo(date);
-
-  // receiver table
-  let subtotalForTotal=0;
-  items.forEach(it=>{const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;subtotalForTotal+=up*it.qty;});
-  const discAmt=Math.round(subtotalForTotal*discPct/100);
+  let sub=0;
+  items.forEach(it=>{const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;sub+=up*it.qty;});
+  const discAmt=Math.round(sub*discPct/100);
   let adjTotal=0;adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  const finalTotal=Math.max(0,subtotalForTotal-discAmt+adjTotal);
-
+  const finalTotal=Math.max(0,sub-discAmt+adjTotal);
   document.getElementById('receiverTable').innerHTML=`
     <tr><td class="rtlabel">총 합계금액</td><td colspan="3" class="rttotal">${fmt(finalTotal)}</td></tr>
     <tr><td class="rtlabel">거래처</td><td>${company}</td><td class="rtlabel">담당자</td><td>${name}</td></tr>
     <tr><td class="rtlabel">연락처</td><td>${phone}</td><td class="rtlabel">주소</td><td>${addr}</td></tr>`;
-
-  // items
-  let no=1,subtotal=0;
+  let no=1;
   const rows=items.map(it=>{
     const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-    const lp=up*it.qty;subtotal+=lp;
-    return `<tr>
-      <td class="text-center">${no++}</td>
-      <td>${it.brand}</td>
-      <td>${it.name}</td>
-      <td class="text-center">${it.qty}</td>
-      <td class="text-right">${fmt(up)}</td>
-      <td class="text-right">${fmt(lp)}</td>
-    </tr>`;
+    const lp=up*it.qty;
+    return `<tr><td class="text-center">${no++}</td><td>${it.brand}</td><td>${it.name}</td><td class="text-center">${it.qty}</td><td class="text-right">${fmt(up)}</td><td class="text-right">${fmt(lp)}</td></tr>`;
   }).join('');
-
-  // adj rows
   let adjRows='';
   if(quoteMode==='retail'){
-    if(discPct>0){
-      adjRows+=`<tr><td class="text-center">-</td><td colspan="3">할인 (${discPct}%)</td><td></td><td class="text-right" style="color:var(--red);">-${fmt(discAmt)}</td></tr>`;
-    }
-    adjItems.forEach(a=>{
-      if((a.value||0)>0){
-        adjRows+=`<tr><td class="text-center">-</td><td colspan="3">${a.label}</td><td></td><td class="text-right" style="color:${a.type==='minus'?'var(--red)':'var(--green)'};">${a.type==='minus'?'-':'+'}${fmt(a.value)}</td></tr>`;
-      }
-    });
+    if(discPct>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">할인 (${discPct}%)</td><td></td><td class="text-right" style="color:#c0392b;">-${fmt(discAmt)}</td></tr>`;
+    adjItems.forEach(a=>{if((a.value||0)>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">${a.label}</td><td></td><td class="text-right" style="color:${a.type==='minus'?'#c0392b':'#1a7a5e'};">${a.type==='minus'?'-':'+'}${fmt(a.value)}</td></tr>`;});
   }
-
   document.getElementById('printItems').innerHTML=rows+adjRows;
-  document.getElementById('printFoot').innerHTML=`
-    <tr style="font-weight:700;border-top:1.5px solid #333;">
-      <td colspan="5" style="padding:8px;text-align:right;font-weight:700;">합 계</td>
-      <td class="text-right" style="padding:8px;font-size:14px;color:var(--green);">${fmt(finalTotal)}</td>
-    </tr>`;
-
+  document.getElementById('printFoot').innerHTML=`<tr style="font-weight:700;border-top:1.5px solid #333;"><td colspan="5" style="padding:8px;text-align:right;font-weight:700;">합 계</td><td class="text-right" style="padding:8px;font-size:14px;color:#1a7a5e;">${fmt(finalTotal)}</td></tr>`;
   document.getElementById('printNote').textContent=note?'비고: '+note:'';
-
   switchTop('print');
+  document.getElementById('printView').classList.add('active');
 }
 
-/* ══════════════════ MANAGE ══════════════════ */
-function switchManageCat(id){currentManageCat=id;renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');renderManageTable();}
+/* ══ COMPARE ══ */
+function renderPlanTabs(){
+  document.getElementById('planTabs').innerHTML=PLAN_LABELS.map((l,i)=>`
+    <button class="plan-tab${i===currentPlan?' active':''}" onclick="switchPlan(${i})">${l}안</button>`).join('');
+  document.getElementById('planModeLabel').textContent=`${PLAN_LABELS[currentPlan]}안 구성 중 — 상품을 선택하세요`;
+}
+function switchPlan(i){
+  currentPlan=i;
+  renderPlanTabs();renderCompareProducts();renderCompareSummary();
+}
+function renderCompareCatTabs(){
+  renderCatTabs('compareCatTabs',compareCat,'switchCompareCat');
+}
+function switchCompareCat(id){compareCat=id;renderCatTabs('compareCatTabs',compareCat,'switchCompareCat');renderCompareProducts();}
+function renderCompareProducts(){
+  const prods=PRODUCTS[compareCat]||[];
+  const planSel=plans[currentPlan].selected;
+  document.getElementById('compareProductArea').innerHTML=`<div class="product-grid">${prods.map(p=>{
+    const sel=planSel[p.id];
+    return `<div class="pcard${sel?' sel':''}" onclick="toggleCompareP('${p.id}')">
+      <div class="pname">${p.name}</div>
+      <div class="pbrand">${p.brand}</div>
+      <div class="pprice">소매: ${fmt(p.price)}</div>
+      ${sel?`<div class="qty-row" onclick="event.stopPropagation()">
+        <button class="qbtn" onclick="chgCompareQty('${p.id}',-1)">−</button>
+        <div class="qnum">${sel.qty}</div>
+        <button class="qbtn" onclick="chgCompareQty('${p.id}',1)">+</button>
+      </div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+}
+function toggleCompareP(id){
+  const p=findP(id);if(!p)return;
+  const sel=plans[currentPlan].selected;
+  if(sel[id])delete sel[id];else sel[id]={...p,qty:1};
+  renderCompareProducts();renderCompareSummary();renderCompareSlides();
+}
+function chgCompareQty(id,d){
+  const sel=plans[currentPlan].selected;
+  if(!sel[id])return;sel[id].qty=Math.max(1,sel[id].qty+d);
+  renderCompareProducts();renderCompareSummary();renderCompareSlides();
+}
+function renderCompareSummary(){
+  const items=Object.values(plans[currentPlan].selected);
+  const el=document.getElementById('compareSummaryItems');
+  if(!items.length){el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div>';document.getElementById('compareTotal').textContent='₩0';return;}
+  let sub=0;
+  el.innerHTML=items.map(it=>{const lp=it.price*it.qty;sub+=lp;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join('');
+  document.getElementById('compareTotal').textContent=fmt(sub);
+}
+function renderCompareSlides(){
+  const track=document.getElementById('compareTrack');
+  const dots=document.getElementById('compareDots');
+  track.innerHTML=PLAN_LABELS.map((l,i)=>{
+    const items=Object.values(plans[i].selected);
+    let sub=0;
+    const rows=items.length?items.map(it=>{const lp=it.price*it.qty;sub+=lp;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">항목 없음</div>';
+    return `<div class="compare-slide">
+      <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
+      ${rows}
+      ${items.length?`<div class="divider"></div><div class="total-row"><span style="font-size:13px;font-weight:700;">합계</span><span style="font-size:16px;font-weight:700;color:var(--green);">${fmt(sub)}</span></div>`:''}
+    </div>`;
+  }).join('');
+  dots.innerHTML=PLAN_LABELS.map((_,i)=>`<button class="compare-dot${i===compareSlide?' active':''}" onclick="goSlide(${i})"></button>`).join('');
+  track.style.transform=`translateX(-${compareSlide*100}%)`;
+}
+function goSlide(i){compareSlide=i;renderCompareSlides();}
+function slideCompare(d){compareSlide=Math.max(0,Math.min(4,compareSlide+d));renderCompareSlides();}
+function clearAllPlans(){
+  if(!confirm('모든 견적안을 초기화할까요?'))return;
+  PLAN_LABELS.forEach((_,i)=>{plans[i].selected={};});
+  currentPlan=0;compareSlide=0;
+  renderPlanTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();
+}
 
+/* ══ MANAGE ══ */
+function switchManageCat(id){currentManageCat=id;renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');renderManageTable();}
+let currentManageCat=CATS[0]?.id||'drum';
 function renderManageTable(){
   const prods=editBuffer[currentManageCat]||[];
   document.getElementById('manageTable').innerHTML=`
     <table class="manage-table">
-      <thead><tr><th style="min-width:140px">상품명</th><th style="min-width:80px">브랜드</th><th style="min-width:90px">소매가</th><th style="min-width:90px">원가</th><th style="width:32px"></th></tr></thead>
+      <thead><tr><th style="min-width:130px">상품명</th><th style="min-width:75px">브랜드</th><th style="min-width:85px">소매가</th><th style="min-width:85px">원가</th><th style="width:30px"></th></tr></thead>
       <tbody>${prods.map((p,i)=>`<tr>
         <td><input value="${p.name}" oninput="uf('${currentManageCat}',${i},'name',this.value)"/></td>
         <td><input value="${p.brand}" oninput="uf('${currentManageCat}',${i},'brand',this.value)"/></td>
@@ -683,7 +774,6 @@ function renderManageTable(){
       </tr>`).join('')}</tbody>
     </table>`;
 }
-
 function uf(cat,idx,f,v){if(editBuffer[cat]&&editBuffer[cat][idx])editBuffer[cat][idx][f]=v;}
 function dp(cat,idx){editBuffer[cat].splice(idx,1);renderManageTable();}
 function addProduct(){
@@ -693,19 +783,14 @@ function addProduct(){
   setTimeout(()=>{const rows=document.querySelectorAll('.manage-table tbody tr');if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp){inp.focus();inp.select();}}},50);
 }
 function saveProducts(){
-  PRODUCTS=JSON.parse(JSON.stringify(editBuffer));
-  save('dm_products',PRODUCTS);
-  selected={};
-  renderProducts();renderSummary();
+  PRODUCTS=JSON.parse(JSON.stringify(editBuffer));save('dm_products',PRODUCTS);
+  selected={};renderProducts();renderSummary();
   const b=document.getElementById('saveBadge');b.style.display='inline';setTimeout(()=>b.style.display='none',2000);
 }
 function resetProducts(){if(!confirm('샘플 데이터로 초기화할까요?'))return;editBuffer=JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));renderManageTable();}
-function renderManage(){
-  renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');
-  renderManageTable();
-}
+function renderManage(){renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');renderManageTable();}
 
-/* ══════════════════ CAT MANAGE ══════════════════ */
+/* ══ CAT MANAGE ══ */
 function renderCatManage(){
   document.getElementById('catManageList').innerHTML=catEditBuffer.map((c,i)=>`
     <div class="cat-manage-row">
@@ -719,28 +804,134 @@ function addCat(){
   setTimeout(()=>{const rows=document.querySelectorAll('.cat-manage-row');if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp){inp.focus();inp.select();}}},50);
 }
 function deleteCat(i){
-  if(!confirm(`"${catEditBuffer[i].label}" 카테고리를 삭제할까요?\n해당 카테고리의 상품도 함께 삭제됩니다.`))return;
-  const id=catEditBuffer[i].id;
-  catEditBuffer.splice(i,1);
-  delete PRODUCTS[id];
-  renderCatManage();
+  if(!confirm(`"${catEditBuffer[i].label}" 카테고리를 삭제할까요?`))return;
+  catEditBuffer.splice(i,1);renderCatManage();
 }
 function saveCats(){
-  CATS=JSON.parse(JSON.stringify(catEditBuffer));
-  save('dm_cats',CATS);
-  // sync products keys
+  CATS=JSON.parse(JSON.stringify(catEditBuffer));save('dm_cats',CATS);
   CATS.forEach(c=>{if(!PRODUCTS[c.id])PRODUCTS[c.id]=[];});
   save('dm_products',PRODUCTS);
-  currentCat=CATS[0]?.id||'';
-  currentManageCat=currentCat;
-  renderProducts();
-  alert('카테고리가 저장되었습니다.');
+  currentCat=CATS[0]?.id||'';currentManageCat=currentCat;
+  renderProducts();alert('카테고리가 저장되었습니다.');
 }
 
-/* ══════════════════ INIT ══════════════════ */
+/* ══ PRESET MANAGE ══ */
+let presetEditBuffer=[], currentEditPreset=0, presetEditCat=CATS[0]?.id||'drum';
+
+function renderPresetManage(){
+  presetEditCat=CATS[0]?.id||'drum';
+  renderPresetEditTabs();
+  renderPresetCatTabs();
+  renderPresetProducts();
+  renderPresetCurrentItems();
+  const nameInput=document.getElementById('presetNameInput');
+  if(nameInput&&presetEditBuffer[currentEditPreset]) nameInput.value=presetEditBuffer[currentEditPreset].label;
+}
+
+function renderPresetEditTabs(){
+  const el=document.getElementById('presetEditTabs');if(!el)return;
+  el.innerHTML=presetEditBuffer.map((p,i)=>
+    `<button class="cat-tab${i===currentEditPreset?' active':''}" onclick="switchEditPreset(${i})">${p.label}</button>`
+  ).join('');
+}
+
+function switchEditPreset(i){
+  currentEditPreset=i;
+  renderPresetEditTabs();
+  renderPresetProducts();
+  renderPresetCurrentItems();
+  const nameInput=document.getElementById('presetNameInput');
+  if(nameInput&&presetEditBuffer[i]) nameInput.value=presetEditBuffer[i].label;
+}
+
+function updatePresetName(v){
+  if(presetEditBuffer[currentEditPreset]) presetEditBuffer[currentEditPreset].label=v;
+  renderPresetEditTabs();
+}
+
+function renderPresetCatTabs(){
+  const el=document.getElementById('presetCatTabs');if(!el)return;
+  el.innerHTML=CATS.map(c=>
+    `<button class="cat-tab${c.id===presetEditCat?' active':''}" onclick="switchPresetCat('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+
+function switchPresetCat(id){
+  presetEditCat=id;
+  renderPresetCatTabs();
+  renderPresetProducts();
+}
+
+function renderPresetProducts(){
+  const el=document.getElementById('presetProductArea');if(!el)return;
+  const prods=PRODUCTS[presetEditCat]||[];
+  const preset=presetEditBuffer[currentEditPreset];
+  if(!preset){el.innerHTML='';return;}
+  el.innerHTML=`<div class="product-grid">${prods.map(p=>{
+    const inPreset=preset.ids.includes(p.id);
+    return `<div class="pcard${inPreset?' sel':''}" onclick="togglePresetProduct('${p.id}')">
+      <div class="pname">${p.name}</div>
+      <div class="pbrand">${p.brand}</div>
+      <div class="pprice">${fmt(p.price)}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function togglePresetProduct(id){
+  const preset=presetEditBuffer[currentEditPreset];if(!preset)return;
+  const idx=preset.ids.indexOf(id);
+  if(idx>=0) preset.ids.splice(idx,1);
+  else preset.ids.push(id);
+  renderPresetProducts();
+  renderPresetCurrentItems();
+}
+
+function renderPresetCurrentItems(){
+  const el=document.getElementById('presetCurrentItems');if(!el)return;
+  const preset=presetEditBuffer[currentEditPreset];
+  if(!preset||!preset.ids.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0;">선택된 상품 없음</div>';return;
+  }
+  el.innerHTML=preset.ids.map(id=>{
+    const p=findP(id);if(!p)return '';
+    return `<div class="sum-row">
+      <span class="sum-label">${p.brand} ${p.name}</span>
+      <span class="sum-price">${fmt(p.price)}</span>
+      <button class="btn icon sm" onclick="togglePresetProduct('${id}')" style="background:var(--red-light);color:var(--red);border:none;margin-left:6px;width:22px;height:22px;">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addPreset(){
+  presetEditBuffer.push({label:'새 프리셋',ids:[]});
+  currentEditPreset=presetEditBuffer.length-1;
+  renderPresetEditTabs();
+  renderPresetProducts();
+  renderPresetCurrentItems();
+  const nameInput=document.getElementById('presetNameInput');
+  if(nameInput){nameInput.value='새 프리셋';nameInput.focus();nameInput.select();}
+}
+
+function deletePreset(){
+  if(presetEditBuffer.length<=1){alert('최소 1개의 프리셋이 필요합니다.');return;}
+  if(!confirm(`"${presetEditBuffer[currentEditPreset].label}" 프리셋을 삭제할까요?`))return;
+  presetEditBuffer.splice(currentEditPreset,1);
+  currentEditPreset=Math.max(0,currentEditPreset-1);
+  renderPresetManage();
+}
+
+function savePresets(){
+  PRESETS=JSON.parse(JSON.stringify(presetEditBuffer));
+  save('dm_presets',PRESETS);
+  renderPresets();
+  const b=document.getElementById('presetSaveBadge');b.style.display='inline';setTimeout(()=>b.style.display='none',2000);
+}
+
+/* ══ INIT ══ */
 document.getElementById('quoteDate').value=todayStr();
 document.getElementById('discountPct').addEventListener('input',renderSummary);
 renderCatTabs('catTabs',currentCat,'switchCat');
+renderPresets();
 renderProducts();
 renderSummary();
 renderAdjList();
