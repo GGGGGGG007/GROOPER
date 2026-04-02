@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<title>드럼몬스터 견적앱</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#f5f4f1;--surface:#ffffff;--border:#e0ddd6;--border2:#ccc9c0;
+    --text:#1a1a1a;--text2:#555;--text3:#999;
+    --green:#1a7a5e;--green-light:#e8f5f0;--green-mid:#2a9d7a;
+    --red:#c0392b;--red-light:#fdf0ee;
+    --blue:#1a5fa8;--blue-light:#eaf1fb;
+    --accent:#2c2c2c;--radius:10px;--radius-sm:6px;
+  }
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+
+  /* ── TOP NAV ── */
+  .nav{background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;position:sticky;top:0;z-index:100;}
+  .nav-title{font-size:15px;font-weight:700;letter-spacing:0.03em;}
+  .nav-tabs{display:flex;gap:4px;}
+  .nav-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.6);transition:all 0.15s;}
+  .nav-tab.active{background:rgba(255,255,255,0.18);color:#fff;}
+
+  /* ── VIEWS ── */
+  .view{display:none;padding:14px;max-width:900px;margin:0 auto;}
+  .view.active{display:block;}
+
+  /* ── CARDS ── */
+  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
+  .card-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid var(--border);}
+
+  /* ── INPUTS ── */
+  input[type=text],input[type=number],input[type=tel],input[type=date],select,textarea{
+    font-family:inherit;font-size:13px;padding:8px 10px;border-radius:var(--radius-sm);
+    border:0.5px solid var(--border2);background:#fff;color:var(--text);width:100%;
+    -webkit-appearance:none;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);}
+  textarea{resize:vertical;min-height:60px;}
+
+  /* ── BUTTONS ── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:#fff;color:var(--text);font-family:inherit;transition:all 0.12s;}
+  .btn:hover{background:var(--bg);}
+  .btn:active{transform:scale(0.98);}
+  .btn.primary{background:var(--green);color:#fff;border-color:transparent;}
+  .btn.primary:hover{background:var(--green-mid);}
+  .btn.danger{background:var(--red-light);color:var(--red);border-color:transparent;}
+  .btn.full{width:100%;}
+  .btn.sm{padding:6px 10px;font-size:12px;}
+  .btn.icon{width:28px;height:28px;padding:0;border-radius:50%;flex-shrink:0;}
+
+  /* ── MODE TABS ── */
+  .mode-tabs{display:flex;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;}
+  .mode-tab{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text3);border-right:0.5px solid var(--border);font-family:inherit;transition:all 0.12s;}
+  .mode-tab:last-child{border-right:none;}
+  .mode-tab.active{background:var(--accent);color:#fff;}
+
+  /* ── CAT TABS ── */
+  .cat-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+  .cat-tabs{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
+  .cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);background:#fff;cursor:pointer;white-space:nowrap;color:var(--text2);font-family:inherit;transition:all 0.12s;}
+  .cat-tab.active{background:var(--accent);color:#fff;border-color:transparent;}
+
+  /* ── PRODUCT GRID ── */
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;margin-bottom:12px;}
+  .pcard{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;cursor:pointer;user-select:none;transition:border-color 0.12s;}
+  .pcard:hover{border-color:var(--border2);}
+  .pcard.sel{border:1.5px solid var(--green);background:var(--green-light);}
+  .pcard.sel .pname{color:#0a4a35;}
+  .pname{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.35;}
+  .pbrand{font-size:10px;color:var(--text3);margin-bottom:4px;}
+  .pprice{font-size:12px;color:var(--text2);}
+  .pcost{font-size:10px;color:var(--text3);}
+  .qty-row{display:flex;align-items:center;gap:6px;margin-top:7px;}
+  .qbtn{width:24px;height:24px;border-radius:50%;border:0.5px solid var(--border2);background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text);line-height:1;}
+  .qnum{font-size:13px;font-weight:700;min-width:18px;text-align:center;}
+
+  /* ── SUMMARY ── */
+  .sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
+  .sum-row:last-of-type{border-bottom:none;}
+  .sum-label{color:var(--text2);flex:1;padding-right:8px;}
+  .sum-qty{color:var(--text3);width:30px;text-align:center;font-size:12px;}
+  .sum-price{font-weight:500;text-align:right;min-width:80px;}
+  .divider{border-top:1px solid var(--border2);margin:8px 0;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+  .stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;}
+  .slabel{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+  .sval{font-size:15px;font-weight:700;}
+  .sval.green{color:var(--green);}
+  .sval.red{color:var(--red);}
+  .sval.blue{color:var(--blue);}
+
+  /* ── ADJ ITEMS ── */
+  .adj-item{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .adj-item input[type=text]{flex:1;}
+  .adj-item select{width:80px;flex-shrink:0;}
+  .adj-item input[type=number]{width:90px;flex-shrink:0;}
+  .add-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:var(--radius-sm);border:0.5px dashed var(--border2);background:transparent;cursor:pointer;color:var(--text3);font-size:12px;width:100%;margin-top:4px;font-family:inherit;}
+  .add-btn:hover{background:var(--bg);}
+
+  /* ── MANAGE TABLE ── */
+  .manage-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .manage-table th{font-size:11px;color:var(--text3);font-weight:500;padding:6px 6px;border-bottom:0.5px solid var(--border2);text-align:left;}
+  .manage-table td{padding:4px 4px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+  .manage-table tr:last-child td{border-bottom:none;}
+  .manage-table input{font-size:12px;padding:4px 6px;border-radius:4px;border:0.5px solid var(--border2);}
+  .manage-table input:focus{border-color:var(--green);}
+  .tbl-wrap{overflow-x:auto;}
+
+  /* ── CAT MANAGE ── */
+  .cat-manage-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:0.5px solid var(--border);background:#fff;}
+  .cat-manage-row:last-child{border-bottom:none;}
+  .cat-manage-row input{flex:1;font-size:13px;}
+
+  /* ── ACTION ROW ── */
+  .action-row{display:flex;gap:8px;margin-top:10px;}
+  .action-row .btn{flex:1;}
+
+  /* ── PRINT / QUOTE PREVIEW ── */
+  .quote-preview{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+
+  /* ────────────────────────────
+     PRINT STYLES
+  ──────────────────────────── */
+  @media print {
+    body{background:#fff;font-size:11pt;}
+    .nav,.view:not(#printView),.no-print{display:none!important;}
+    #printView{display:block!important;padding:0;}
+    .print-page{padding:16mm 14mm;max-width:none;}
+  }
+
+  /* ── PRINT PAGE ── */
+  .print-page{padding:20px;}
+
+  .quote-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .quote-header-left h1{font-size:22px;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin-bottom:4px;}
+  .quote-header-left .q-date{font-size:12px;color:var(--text2);}
+
+  .company-box{text-align:right;font-size:11px;color:var(--text2);line-height:1.7;}
+  .company-box .company-name{font-size:14px;font-weight:700;color:var(--accent);}
+
+  .receiver-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;}
+  .receiver-table td{padding:5px 8px;border:0.5px solid #aaa;}
+  .receiver-table .rtlabel{background:#f0efe9;color:var(--text2);font-weight:500;width:70px;white-space:nowrap;}
+  .receiver-table .rttotal{font-size:15px;font-weight:700;color:var(--accent);}
+
+  .items-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
+  .items-table th{background:#2c2c2c;color:#fff;padding:7px 8px;font-weight:500;font-size:11px;}
+  .items-table td{padding:6px 8px;border-bottom:0.5px solid #ddd;vertical-align:middle;}
+  .items-table tr:nth-child(even) td{background:#f9f8f5;}
+  .items-table .text-right{text-align:right;}
+  .items-table .text-center{text-align:center;}
+
+  .quote-footer-note{font-size:11px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:8px;margin-top:4px;}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:480px){
+    .product-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-grid{grid-template-columns:repeat(3,1fr);}
+    .nav-title{font-size:13px;}
+    .nav-tab{padding:5px 10px;font-size:11px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-title">🥁 드럼몬스터</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTop('quote')">견적</button>
+    <button class="nav-tab" onclick="switchTop('manage')">상품관리</button>
+    <button class="nav-tab" onclick="switchTop('catmanage')">카테고리</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════ QUOTE VIEW ═══════════════════════════════ -->
+<div class="view active" id="quoteView">
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="switchMode('retail')">소매 견적</button>
+    <button class="mode-tab" onclick="switchMode('wholesale')">도매 견적</button>
+  </div>
+
+  <!-- 수신처 정보 -->
+  <div class="card">
+    <div class="card-title">수신처 정보</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">거래처명</div>
+        <input type="text" id="custCompany" placeholder="상호명"/>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">담당자</div>
+        <input type="text" id="custName" placeholder="담당자명"/>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">연락처</div>
+        <input type="tel" id="custPhone" placeholder="010-0000-0000"/>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">발행일</div>
+        <input type="date" id="quoteDate"/>
+      </div>
+      <div style="grid-column:1/-1;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">주소</div>
+        <input type="text" id="custAddr" placeholder="주소 (선택)"/>
+      </div>
+      <div style="grid-column:1/-1;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">비고</div>
+        <textarea id="custNote" placeholder="특이사항, 배송 요청 등"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상품 선택 -->
+  <div class="card">
+    <div class="card-title">상품 선택</div>
+    <div class="cat-scroll"><div class="cat-tabs" id="catTabs"></div></div>
+    <div id="productArea"></div>
+  </div>
+
+  <!-- 견적 내역 -->
+  <div class="card">
+    <div class="card-title">견적 내역</div>
+    <div id="summaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div></div>
+
+    <!-- 소매 옵션 -->
+    <div id="retailOptions">
+      <div style="height:10px;"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">추가 항목</div>
+      <div id="adjList"></div>
+      <button class="add-btn" onclick="addAdj()">+ 항목 추가 (카드수수료·출장비 등)</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap;">할인</span>
+        <input type="number" id="discountPct" value="0" min="0" max="100" style="width:70px;" oninput="renderSummary()"/>
+        <span style="font-size:13px;color:var(--text2);">%</span>
+      </div>
+    </div>
+
+    <!-- 도매 옵션 -->
+    <div id="wholesaleOptions" style="display:none;">
+      <div style="height:10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--text2);">원가에</span>
+        <input type="number" id="wholesaleMargin" value="12" min="0" max="100" style="width:65px;" oninput="renderProducts();renderSummary()"/>
+        <span style="font-size:13px;color:var(--text2);">% 추가</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="total-row">
+      <span style="font-size:15px;font-weight:700;">최종 금액</span>
+      <span style="font-size:22px;font-weight:700;color:var(--green);" id="totalPrice">₩0</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="slabel">원가 합계</div><div class="sval blue" id="statCost">₩0</div></div>
+      <div class="stat"><div class="slabel">순이익</div><div class="sval green" id="statProfit">₩0</div></div>
+      <div class="stat"><div class="slabel">수익률</div><div class="sval green" id="statMargin">0%</div></div>
+    </div>
+    <div class="action-row" style="margin-top:14px;">
+      <button class="btn" onclick="resetAll()">초기화</button>
+      <button class="btn" onclick="copyText()">텍스트 복사</button>
+      <button class="btn primary" onclick="showPrint()">견적서 출력</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MANAGE VIEW ═══════════════════════════════ -->
+<div class="view" id="manageView">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:14px;font-weight:700;">상품 편집</span>
+      <span id="saveBadge" style="font-size:11px;color:var(--green);background:var(--green-light);border-radius:4px;padding:2px 8px;display:none;">저장됨</span>
+    </div>
+    <div class="cat-scroll"><div class="cat-tabs" id="catEditTabs"></div></div>
+    <div class="tbl-wrap"><div id="manageTable"></div></div>
+    <button class="add-btn" onclick="addProduct()" style="margin-top:8px;">+ 상품 추가</button>
+    <div class="action-row" style="margin-top:12px;">
+      <button class="btn" onclick="resetProducts()">샘플 초기화</button>
+      <button class="btn primary" onclick="saveProducts()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CAT MANAGE VIEW ═══════════════════════════════ -->
+<div class="view" id="catmanageView">
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px;">카테고리 편집</div>
+    <div id="catManageList"></div>
+    <button class="add-btn" onclick="addCat()" style="margin-top:8px;">+ 카테고리 추가</button>
+    <div class="action-row" style="margin-top:12px;">
+      <button class="btn primary full" onclick="saveCats()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PRINT VIEW ═══════════════════════════════ -->
+<div class="view" id="printView">
+  <div class="print-page" id="printContent">
+
+    <div class="quote-header">
+      <div class="quote-header-left">
+        <h1>견 적 서</h1>
+        <div class="q-date" id="printDate"></div>
+      </div>
+      <div class="company-box">
+        <div class="company-name">드럼몬스터</div>
+        <div>대표: 한정수</div>
+        <div>등록번호: 134-29-16863</div>
+        <div>경기도 안산시 상록구 건건로 69 지하1층</div>
+        <div>업태: 도소매 / 종목: 악기</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;margin-bottom:8px;">아래와 같이 견적합니다.</div>
+
+    <table class="receiver-table" id="receiverTable"></table>
+
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width:5%">No.</th>
+          <th style="width:25%">브랜드</th>
+          <th style="width:35%">상품명</th>
+          <th style="width:8%" class="text-center">수량</th>
+          <th style="width:12%" class="text-right">단가</th>
+          <th style="width:15%" class="text-right">공급가액</th>
+        </tr>
+      </thead>
+      <tbody id="printItems"></tbody>
+      <tfoot id="printFoot"></tfoot>
+    </table>
+
+    <div class="quote-footer-note">본 견적서는 영수증 용도로도 사용이 가능합니다.</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="printNote"></div>
+  </div>
+
+  <div class="no-print" style="padding:0 14px 14px;max-width:900px;margin:0 auto;">
+    <div class="action-row">
+      <button class="btn" onclick="switchTop('quote')">← 돌아가기</button>
+      <button class="btn primary" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════ DATA ══════════════════ */
+const DEFAULT_CATS = [
+  {id:'drum',label:'드럼 본체'},
+  {id:'cymbal',label:'심벌'},
+  {id:'hardware',label:'하드웨어'},
+  {id:'chair',label:'의자'},
+  {id:'stick',label:'스틱·말렛'},
+  {id:'accessory',label:'악세사리'},
+];
+
+const DEFAULT_PRODUCTS = {
+  drum:[
+    {id:'d1',name:'Mapex Mars 5pc',brand:'Mapex',price:890000,cost:620000},
+    {id:'d2',name:'Pearl Export 5pc',brand:'Pearl',price:750000,cost:510000},
+    {id:'d3',name:'Tama Imperialstar 5pc',brand:'Tama',price:980000,cost:680000},
+    {id:'d4',name:'DW Design 5pc',brand:'DW',price:2200000,cost:1560000},
+    {id:'d5',name:'Ludwig Accent 5pc',brand:'Ludwig',price:620000,cost:420000},
+    {id:'d6',name:'Gretsch Catalina Maple',brand:'Gretsch',price:1450000,cost:990000},
+  ],
+  cymbal:[
+    {id:'c1',name:'Zildjian A Custom 세트',brand:'Zildjian',price:680000,cost:460000},
+    {id:'c2',name:'Sabian HHX Evolution 세트',brand:'Sabian',price:920000,cost:630000},
+    {id:'c3',name:'Meinl Byzance Jazz 세트',brand:'Meinl',price:1100000,cost:760000},
+    {id:'c4',name:'Paiste PST 7 세트',brand:'Paiste',price:420000,cost:280000},
+    {id:'c5',name:'하이햇 Zildjian A 14"',brand:'Zildjian',price:280000,cost:185000},
+    {id:'c6',name:'크래쉬 Sabian AAX 16"',brand:'Sabian',price:185000,cost:120000},
+  ],
+  hardware:[
+    {id:'h1',name:'Pearl 900 풀세트',brand:'Pearl',price:480000,cost:320000},
+    {id:'h2',name:'Tama Iron Cobra 페달 단발',brand:'Tama',price:310000,cost:210000},
+    {id:'h3',name:'DW 5000 페달 단발',brand:'DW',price:380000,cost:260000},
+    {id:'h4',name:'Gibraltar 심벌 스탠드',brand:'Gibraltar',price:75000,cost:48000},
+    {id:'h5',name:'Pearl 스네어 스탠드',brand:'Pearl',price:65000,cost:42000},
+    {id:'h6',name:'Tama Iron Cobra 더블 페달',brand:'Tama',price:520000,cost:355000},
+  ],
+  chair:[
+    {id:'ch1',name:'Pearl D-1500S 버블 시트',brand:'Pearl',price:145000,cost:95000},
+    {id:'ch2',name:'Roc-n-Soc Nitro Throne',brand:'Roc-n-Soc',price:280000,cost:190000},
+    {id:'ch3',name:'Tama HT550BC 1st Chair',brand:'Tama',price:220000,cost:148000},
+    {id:'ch4',name:'DW 5100 Universal',brand:'DW',price:195000,cost:130000},
+  ],
+  stick:[
+    {id:'s1',name:'Vic Firth 5A (1쌍)',brand:'Vic Firth',price:18000,cost:11000},
+    {id:'s2',name:'Zildjian 5B Anti-Vibe (1쌍)',brand:'Zildjian',price:22000,cost:14000},
+    {id:'s3',name:'Pro-Mark TX5AW (1쌍)',brand:'Pro-Mark',price:16000,cost:10000},
+    {id:'s4',name:'Vater 5A (1쌍)',brand:'Vater',price:17000,cost:11000},
+    {id:'s5',name:'말렛 Vic Firth M12 (1쌍)',brand:'Vic Firth',price:35000,cost:22000},
+    {id:'s6',name:'브러쉬 Vic Firth WB (1쌍)',brand:'Vic Firth',price:28000,cost:18000},
+  ],
+  accessory:[
+    {id:'a1',name:'드럼 가방 세트 5pc',brand:'Mapex',price:135000,cost:88000},
+    {id:'a2',name:'Evans G2 헤드 세트',brand:'Evans',price:98000,cost:65000},
+    {id:'a3',name:'드럼 소음패드 세트',brand:'HQ',price:65000,cost:42000},
+    {id:'a4',name:'Snark ST-8 튜너',brand:'Snark',price:28000,cost:18000},
+    {id:'a5',name:'드럼 매트 150x200cm',brand:'Roland',price:89000,cost:58000},
+    {id:'a6',name:'케이스 하드 스네어용',brand:'Gator',price:72000,cost:47000},
+  ],
+};
+
+/* ══════════════════ STATE ══════════════════ */
+function load(key,def){try{const r=localStorage.getItem(key);return r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){return JSON.parse(JSON.stringify(def));}}
+function save(key,data){try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}}
+
+let CATS = load('dm_cats', DEFAULT_CATS);
+let PRODUCTS = load('dm_products', DEFAULT_PRODUCTS);
+let selected = {};
+let currentCat = CATS[0]?.id || 'drum';
+let currentManageCat = CATS[0]?.id || 'drum';
+let quoteMode = 'retail';
+let adjItems = [];
+let editBuffer = {};
+let catEditBuffer = [];
+
+/* ══════════════════ UTILS ══════════════════ */
+function fmt(v){return '₩'+Math.round(v).toLocaleString('ko-KR');}
+function pct(v){return (Math.round(v*10)/10)+'%';}
+function todayStr(){const d=new Date();return d.toISOString().slice(0,10);}
+function fmtDateKo(s){if(!s)return '';const[y,m,d]=s.split('-');return y+'년 '+parseInt(m)+'월 '+parseInt(d)+'일';}
+
+/* ══════════════════ TOP NAV ══════════════════ */
+function switchTop(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>{
+    b.classList.toggle('active',['quote','manage','catmanage','print'].indexOf(v)===i||(v==='print'&&i===0));
+  });
+  document.getElementById(v+'View').classList.add('active');
+  if(v==='manage'){editBuffer=JSON.parse(JSON.stringify(PRODUCTS));renderManage();}
+  if(v==='catmanage'){catEditBuffer=JSON.parse(JSON.stringify(CATS));renderCatManage();}
+}
+
+/* ══════════════════ MODE ══════════════════ */
+function switchMode(m){
+  quoteMode=m;
+  document.querySelectorAll('.mode-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&m==='retail')||(i===1&&m==='wholesale')));
+  document.getElementById('retailOptions').style.display=m==='retail'?'':'none';
+  document.getElementById('wholesaleOptions').style.display=m==='wholesale'?'':'none';
+  renderProducts();renderSummary();
+}
+
+/* ══════════════════ CAT TABS ══════════════════ */
+function renderCatTabs(containerId, current, clickFn){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=CATS.map(c=>`<button class="cat-tab${c.id===current?' active':''}" onclick="${clickFn}('${c.id}')">${c.label}</button>`).join('');
+}
+
+function switchCat(id){currentCat=id;renderCatTabs('catTabs',currentCat,'switchCat');renderProducts();}
+
+/* ══════════════════ PRODUCTS ══════════════════ */
+function renderProducts(){
+  renderCatTabs('catTabs',currentCat,'switchCat');
+  const prods=(PRODUCTS[currentCat]||[]);
+  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
+  document.getElementById('productArea').innerHTML=`<div class="product-grid">${prods.map(p=>{
+    const sel=selected[p.id];
+    const unitPrice=quoteMode==='wholesale'?Math.round((p.cost||0)*(1+margin/100)):p.price;
+    return `<div class="pcard${sel?' sel':''}" onclick="toggleP('${p.id}')">
+      <div class="pname">${p.name}</div>
+      <div class="pbrand">${p.brand}</div>
+      <div class="pprice">${quoteMode==='wholesale'?'도매: ':'소매: '}${fmt(unitPrice)}</div>
+      ${quoteMode==='retail'&&p.cost?`<div class="pcost">원가: ${fmt(p.cost)}</div>`:''}
+      ${sel?`<div class="qty-row" onclick="event.stopPropagation()">
+        <button class="qbtn" onclick="chgQty('${p.id}',-1)">−</button>
+        <div class="qnum">${sel.qty}</div>
+        <button class="qbtn" onclick="chgQty('${p.id}',1)">+</button>
+      </div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function toggleP(id){
+  const p=findP(id);if(!p)return;
+  if(selected[id])delete selected[id];
+  else selected[id]={...p,qty:1};
+  renderProducts();renderSummary();
+}
+function chgQty(id,d){
+  if(!selected[id])return;
+  selected[id].qty=Math.max(1,selected[id].qty+d);
+  renderProducts();renderSummary();
+}
+function findP(id){for(const c of Object.values(PRODUCTS)){const p=c.find(x=>x.id===id);if(p)return p;}}
+
+/* ══════════════════ ADJ ITEMS ══════════════════ */
+function addAdj(){adjItems.push({label:'카드수수료',type:'minus',value:0});renderAdjList();renderSummary();}
+function removeAdj(i){adjItems.splice(i,1);renderAdjList();renderSummary();}
+function updateAdj(i,field,val){adjItems[i][field]=field==='value'?parseFloat(val)||0:val;renderSummary();}
+function renderAdjList(){
+  const el=document.getElementById('adjList');if(!el)return;
+  el.innerHTML=adjItems.map((a,i)=>`
+    <div class="adj-item">
+      <input type="text" value="${a.label}" placeholder="항목명" oninput="updateAdj(${i},'label',this.value)"/>
+      <select onchange="updateAdj(${i},'type',this.value)">
+        <option value="minus"${a.type==='minus'?' selected':''}>− 차감</option>
+        <option value="plus"${a.type==='plus'?' selected':''}>+ 추가</option>
+      </select>
+      <input type="number" value="${a.value}" placeholder="0" oninput="updateAdj(${i},'value',this.value)"/>
+      <button class="btn icon" onclick="removeAdj(${i})" style="background:var(--red-light);color:var(--red);border:none;">×</button>
+    </div>`).join('');
+}
+
+/* ══════════════════ SUMMARY ══════════════════ */
+function renderSummary(){
+  const items=Object.values(selected);
+  const el=document.getElementById('summaryItems');if(!el)return;
+  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
+  let subtotal=0,totalCost=0;
+
+  if(!items.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div>';
+  } else {
+    el.innerHTML=items.map(it=>{
+      const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
+      const lp=up*it.qty;const lc=(it.cost||0)*it.qty;
+      subtotal+=lp;totalCost+=lc;
+      return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;
+    }).join('');
+  }
+
+  // recalc totals after loop
+  totalCost=0;
+  items.forEach(it=>{totalCost+=(it.cost||0)*it.qty;});
+
+  let adjTotal=0;
+  if(quoteMode==='retail'){
+    const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
+    const discAmt=Math.round(subtotal*discPct/100);
+    adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
+    const final=Math.max(0,subtotal-discAmt+adjTotal);
+    const profit=final-totalCost;
+    document.getElementById('totalPrice').textContent=fmt(final);
+    document.getElementById('statCost').textContent=fmt(totalCost);
+    const pEl=document.getElementById('statProfit');
+    pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
+    const mEl=document.getElementById('statMargin');
+    const rate=final>0?profit/final*100:0;
+    mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
+  } else {
+    const final=subtotal;
+    const profit=final-totalCost;
+    document.getElementById('totalPrice').textContent=fmt(final);
+    document.getElementById('statCost').textContent=fmt(totalCost);
+    const pEl=document.getElementById('statProfit');
+    pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
+    const mEl=document.getElementById('statMargin');
+    const rate=final>0?profit/final*100:0;
+    mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
+  }
+}
+
+/* ══════════════════ RESET ══════════════════ */
+function resetAll(){
+  selected={};adjItems=[];
+  ['custCompany','custName','custPhone','custAddr','custNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('quoteDate').value=todayStr();
+  document.getElementById('discountPct').value='0';
+  renderAdjList();renderProducts();renderSummary();
+}
+
+/* ══════════════════ COPY TEXT ══════════════════ */
+function buildText(){
+  const company=document.getElementById('custCompany')?.value||'';
+  const name=document.getElementById('custName')?.value||'고객';
+  const phone=document.getElementById('custPhone')?.value||'';
+  const date=document.getElementById('quoteDate')?.value||todayStr();
+  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
+  const items=Object.values(selected);
+  const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
+  let subtotal=0,lines='';
+  items.forEach(it=>{
+    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
+    const lp=up*it.qty;subtotal+=lp;
+    lines+=`${it.brand} ${it.name} ×${it.qty}  ${fmt(lp)}\n`;
+  });
+  const discAmt=Math.round(subtotal*discPct/100);
+  let adjTotal=0,adjLines='';
+  adjItems.forEach(a=>{const v=a.value||0;const s=a.type==='plus'?1:-1;adjTotal+=s*v;if(v>0)adjLines+=`${a.label}: ${a.type==='plus'?'+':'-'}${fmt(v)}\n`;});
+  const final=Math.max(0,subtotal-discAmt+adjTotal);
+  let txt=`🥁 드럼몬스터 견적서\n발행일: ${fmtDateKo(date)}\n━━━━━━━━━━━━━━\n`;
+  if(company)txt+=`거래처: ${company}\n`;
+  txt+=`담당자: ${name}`;if(phone)txt+=` / ${phone}`;txt+=`\n━━━━━━━━━━━━━━\n${lines}`;
+  if(discPct>0||adjLines){txt+=`━━━━━━━━━━━━━━\n소계: ${fmt(subtotal)}\n`;if(discPct>0)txt+=`할인(${discPct}%): -${fmt(discAmt)}\n`;if(adjLines)txt+=adjLines;}
+  txt+=`━━━━━━━━━━━━━━\n합계: ${fmt(final)}\n\n드럼몬스터 / 한정수\n031)000-0000`;
+  return txt;
+}
+function copyText(){
+  const txt=buildText();
+  navigator.clipboard.writeText(txt).then(()=>alert('복사 완료!\n카카오톡에 붙여넣기 하세요.')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('복사 완료!');});
+}
+
+/* ══════════════════ PRINT ══════════════════ */
+function showPrint(){
+  const company=document.getElementById('custCompany')?.value||'';
+  const name=document.getElementById('custName')?.value||'';
+  const phone=document.getElementById('custPhone')?.value||'';
+  const addr=document.getElementById('custAddr')?.value||'';
+  const note=document.getElementById('custNote')?.value||'';
+  const date=document.getElementById('quoteDate')?.value||todayStr();
+  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
+  const items=Object.values(selected);
+  const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
+
+  document.getElementById('printDate').textContent='발행일: '+fmtDateKo(date);
+
+  // receiver table
+  let subtotalForTotal=0;
+  items.forEach(it=>{const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;subtotalForTotal+=up*it.qty;});
+  const discAmt=Math.round(subtotalForTotal*discPct/100);
+  let adjTotal=0;adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
+  const finalTotal=Math.max(0,subtotalForTotal-discAmt+adjTotal);
+
+  document.getElementById('receiverTable').innerHTML=`
+    <tr><td class="rtlabel">총 합계금액</td><td colspan="3" class="rttotal">${fmt(finalTotal)}</td></tr>
+    <tr><td class="rtlabel">거래처</td><td>${company}</td><td class="rtlabel">담당자</td><td>${name}</td></tr>
+    <tr><td class="rtlabel">연락처</td><td>${phone}</td><td class="rtlabel">주소</td><td>${addr}</td></tr>`;
+
+  // items
+  let no=1,subtotal=0;
+  const rows=items.map(it=>{
+    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
+    const lp=up*it.qty;subtotal+=lp;
+    return `<tr>
+      <td class="text-center">${no++}</td>
+      <td>${it.brand}</td>
+      <td>${it.name}</td>
+      <td class="text-center">${it.qty}</td>
+      <td class="text-right">${fmt(up)}</td>
+      <td class="text-right">${fmt(lp)}</td>
+    </tr>`;
+  }).join('');
+
+  // adj rows
+  let adjRows='';
+  if(quoteMode==='retail'){
+    if(discPct>0){
+      adjRows+=`<tr><td class="text-center">-</td><td colspan="3">할인 (${discPct}%)</td><td></td><td class="text-right" style="color:var(--red);">-${fmt(discAmt)}</td></tr>`;
+    }
+    adjItems.forEach(a=>{
+      if((a.value||0)>0){
+        adjRows+=`<tr><td class="text-center">-</td><td colspan="3">${a.label}</td><td></td><td class="text-right" style="color:${a.type==='minus'?'var(--red)':'var(--green)'};">${a.type==='minus'?'-':'+'}${fmt(a.value)}</td></tr>`;
+      }
+    });
+  }
+
+  document.getElementById('printItems').innerHTML=rows+adjRows;
+  document.getElementById('printFoot').innerHTML=`
+    <tr style="font-weight:700;border-top:1.5px solid #333;">
+      <td colspan="5" style="padding:8px;text-align:right;font-weight:700;">합 계</td>
+      <td class="text-right" style="padding:8px;font-size:14px;color:var(--green);">${fmt(finalTotal)}</td>
+    </tr>`;
+
+  document.getElementById('printNote').textContent=note?'비고: '+note:'';
+
+  switchTop('print');
+}
+
+/* ══════════════════ MANAGE ══════════════════ */
+function switchManageCat(id){currentManageCat=id;renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');renderManageTable();}
+
+function renderManageTable(){
+  const prods=editBuffer[currentManageCat]||[];
+  document.getElementById('manageTable').innerHTML=`
+    <table class="manage-table">
+      <thead><tr><th style="min-width:140px">상품명</th><th style="min-width:80px">브랜드</th><th style="min-width:90px">소매가</th><th style="min-width:90px">원가</th><th style="width:32px"></th></tr></thead>
+      <tbody>${prods.map((p,i)=>`<tr>
+        <td><input value="${p.name}" oninput="uf('${currentManageCat}',${i},'name',this.value)"/></td>
+        <td><input value="${p.brand}" oninput="uf('${currentManageCat}',${i},'brand',this.value)"/></td>
+        <td><input type="number" value="${p.price}" oninput="uf('${currentManageCat}',${i},'price',+this.value)"/></td>
+        <td><input type="number" value="${p.cost||0}" oninput="uf('${currentManageCat}',${i},'cost',+this.value)"/></td>
+        <td><button class="btn icon sm" onclick="dp('${currentManageCat}',${i})" style="background:var(--red-light);color:var(--red);border:none;width:26px;height:26px;">×</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function uf(cat,idx,f,v){if(editBuffer[cat]&&editBuffer[cat][idx])editBuffer[cat][idx][f]=v;}
+function dp(cat,idx){editBuffer[cat].splice(idx,1);renderManageTable();}
+function addProduct(){
+  if(!editBuffer[currentManageCat])editBuffer[currentManageCat]=[];
+  editBuffer[currentManageCat].push({id:currentManageCat+Date.now(),name:'새 상품',brand:'',price:0,cost:0});
+  renderManageTable();
+  setTimeout(()=>{const rows=document.querySelectorAll('.manage-table tbody tr');if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp){inp.focus();inp.select();}}},50);
+}
+function saveProducts(){
+  PRODUCTS=JSON.parse(JSON.stringify(editBuffer));
+  save('dm_products',PRODUCTS);
+  selected={};
+  renderProducts();renderSummary();
+  const b=document.getElementById('saveBadge');b.style.display='inline';setTimeout(()=>b.style.display='none',2000);
+}
+function resetProducts(){if(!confirm('샘플 데이터로 초기화할까요?'))return;editBuffer=JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));renderManageTable();}
+function renderManage(){
+  renderCatTabs('catEditTabs',currentManageCat,'switchManageCat');
+  renderManageTable();
+}
+
+/* ══════════════════ CAT MANAGE ══════════════════ */
+function renderCatManage(){
+  document.getElementById('catManageList').innerHTML=catEditBuffer.map((c,i)=>`
+    <div class="cat-manage-row">
+      <input type="text" value="${c.label}" oninput="catEditBuffer[${i}].label=this.value" style="flex:1;"/>
+      <button class="btn icon" onclick="deleteCat(${i})" style="background:var(--red-light);color:var(--red);border:none;flex-shrink:0;">×</button>
+    </div>`).join('');
+}
+function addCat(){
+  catEditBuffer.push({id:'cat'+Date.now(),label:'새 카테고리'});
+  renderCatManage();
+  setTimeout(()=>{const rows=document.querySelectorAll('.cat-manage-row');if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp){inp.focus();inp.select();}}},50);
+}
+function deleteCat(i){
+  if(!confirm(`"${catEditBuffer[i].label}" 카테고리를 삭제할까요?\n해당 카테고리의 상품도 함께 삭제됩니다.`))return;
+  const id=catEditBuffer[i].id;
+  catEditBuffer.splice(i,1);
+  delete PRODUCTS[id];
+  renderCatManage();
+}
+function saveCats(){
+  CATS=JSON.parse(JSON.stringify(catEditBuffer));
+  save('dm_cats',CATS);
+  // sync products keys
+  CATS.forEach(c=>{if(!PRODUCTS[c.id])PRODUCTS[c.id]=[];});
+  save('dm_products',PRODUCTS);
+  currentCat=CATS[0]?.id||'';
+  currentManageCat=currentCat;
+  renderProducts();
+  alert('카테고리가 저장되었습니다.');
+}
+
+/* ══════════════════ INIT ══════════════════ */
+document.getElementById('quoteDate').value=todayStr();
+document.getElementById('discountPct').addEventListener('input',renderSummary);
+renderCatTabs('catTabs',currentCat,'switchCat');
+renderProducts();
+renderSummary();
+renderAdjList();
+</script>
+</body>
+</html>
