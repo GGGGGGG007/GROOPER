@@ -153,10 +153,10 @@ textarea{resize:vertical;min-height:60px;}
 /* PRINT PAGE */
 .print-page{padding:20px;}
 .quote-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
-.quote-header-left h1{font-size:36px;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:4px;}
-.quote-header-left .q-date{font-size:13px;color:var(--text2);}
-.company-box{text-align:right;font-size:13px;color:var(--text2);line-height:1.9;}
-.company-box .company-name{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:2px;}
+.quote-header-left h1{font-size:clamp(20px,4vw,32px);font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:4px;}
+.quote-header-left .q-date{font-size:clamp(10px,1.5vw,13px);color:var(--text2);}
+.company-box{text-align:right;font-size:clamp(10px,1.4vw,12px);color:var(--text2);line-height:1.8;}
+.company-box .company-name{font-size:clamp(13px,2vw,17px);font-weight:700;color:var(--accent);margin-bottom:2px;}
 .receiver-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;}
 .receiver-table td{padding:5px 8px;border:0.5px solid #aaa;}
 .receiver-table .rtlabel{background:#f0efe9;color:var(--text2);font-weight:500;width:70px;white-space:nowrap;}
@@ -174,22 +174,55 @@ textarea{resize:vertical;min-height:60px;}
   .product-grid{grid-template-columns:repeat(2,1fr);}
   .stat-grid{grid-template-columns:repeat(3,1fr);}
 }
+
+/* PASSWORD LOCK */
+.lock-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--accent);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.lock-box{background:#fff;border-radius:var(--radius);padding:32px 28px;width:100%;max-width:320px;text-align:center;}
+.lock-logo{font-size:32px;margin-bottom:8px;}
+.lock-title{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.lock-sub{font-size:12px;color:var(--text3);margin-bottom:24px;}
+.lock-input{font-size:16px;padding:12px;text-align:center;letter-spacing:0.2em;border-radius:var(--radius-sm);border:1.5px solid var(--border2);width:100%;margin-bottom:12px;font-family:inherit;}
+.lock-input:focus{outline:none;border-color:var(--green);}
+.lock-btn{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;background:var(--green);color:#fff;cursor:pointer;font-family:inherit;}
+.lock-btn:active{transform:scale(0.98);}
+.lock-error{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
 </style>
 </head>
 <body>
+
+<!-- ═══ PASSWORD LOCK ═══ -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">🥁</div>
+    <div class="lock-title">드럼몬스터</div>
+    <div class="lock-sub">비밀번호를 입력하세요</div>
+    <input class="lock-input" type="password" id="lockInput" placeholder="••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <button class="lock-btn" onclick="checkPassword()">확인</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-title">🥁 드럼몬스터</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTop('quote')">견적</button>
     <button class="nav-tab" onclick="switchTop('compare')">비교</button>
-    <button class="nav-tab" onclick="switchTop('manage')">상품관리</button>
     <button class="nav-tab" onclick="switchTop('presetmanage')">프리셋</button>
-    <button class="nav-tab" onclick="switchTop('catmanage')">카테고리</button>
+    <button class="nav-tab" onclick="reloadSheets()">↻ 새로고침</button>
   </div>
 </nav>
 
-<!-- ═══ QUOTE VIEW ═══ -->
+<!-- ═══ LOADING BAR ═══ -->
+<div id="loadingBar" style="position:fixed;top:52px;left:0;width:100%;background:#fff;z-index:90;padding:20px;text-align:center;border-bottom:0.5px solid var(--border);">
+  <div style="font-size:13px;color:var(--text2);" id="loadingMsg">데이터 불러오는 중...</div>
+  <div style="margin-top:8px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+    <div style="height:100%;background:var(--green);animation:loading 1.5s infinite;border-radius:2px;"></div>
+  </div>
+</div>
+<style>
+@keyframes loading{0%{width:0%;margin-left:0;}50%{width:60%;margin-left:20%;}100%{width:0%;margin-left:100%;}}
+</style>
 <div class="view active" id="quoteView">
   <div class="mode-tabs">
     <button class="mode-tab active" onclick="switchMode('retail')">소매 견적</button>
@@ -356,7 +389,7 @@ textarea{resize:vertical;min-height:60px;}
         <div class="company-name">드럼몬스터</div>
         <div>대표: 한정수</div>
         <div>등록번호: 134-29-16863</div>
-        <div>경기도 안산시 상록구 건건로 69 지하1층</div>
+        <div>경기도 안산시 상록구 건건로 69 지하</div>
         <div>업태: 도소매 / 종목: 악기</div>
       </div>
     </div>
@@ -451,20 +484,88 @@ const DEFAULT_PRESETS=[
 ];
 
 /* ══ STATE ══ */
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby7du2ggzJmn_Z6M1mnO-n4IR-XoA4EgeE1wRVAKPTR9v9BjLW1yrbesGMM1eMGf9pY/exec';
+
 function load(k,d){try{const r=localStorage.getItem(k);return r?JSON.parse(r):JSON.parse(JSON.stringify(d));}catch(e){return JSON.parse(JSON.stringify(d));}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
-let CATS=load('dm_cats',DEFAULT_CATS);
-let PRODUCTS=load('dm_products',DEFAULT_PRODUCTS);
+let CATS=[];
+let PRODUCTS={};
 let PRESETS=load('dm_presets',DEFAULT_PRESETS);
 
-let selected={}, currentCat=CATS[0]?.id||'drum', quoteMode='retail', adjItems=[];
+let selected={}, currentCat='', quoteMode='retail', adjItems=[];
 let editBuffer={}, catEditBuffer=[];
 
 /* 비교 안 A~E */
 const PLAN_LABELS=['A','B','C','D','E'];
 let plans=PLAN_LABELS.map(l=>({label:l,selected:{}}));
-let currentPlan=0, compareCat=CATS[0]?.id||'drum', compareSlide=0;
+let currentPlan=0, compareCat='', compareSlide=0;
+
+/* ══ SHEETS 데이터 로드 ══ */
+function showLoading(msg){
+  const el=document.getElementById('loadingMsg');
+  if(el)el.textContent=msg||'데이터 불러오는 중...';
+}
+
+async function loadFromSheets(){
+  showLoading('Google Sheets에서 데이터 불러오는 중...');
+  try {
+    const res = await fetch(SHEETS_URL);
+    const rows = await res.json();
+
+    // 카테고리 추출 (순서 유지, 중복 제거)
+    const catMap = new Map();
+    rows.forEach(r => {
+      if(r.category_id && !catMap.has(r.category_id)){
+        catMap.set(r.category_id, r.category_name || r.category_id);
+      }
+    });
+    CATS = Array.from(catMap.entries()).map(([id,label])=>({id,label}));
+
+    // 상품 구성
+    PRODUCTS = {};
+    CATS.forEach(c=>{ PRODUCTS[c.id]=[]; });
+    rows.forEach((r,i)=>{
+      if(!r.category_id) return;
+      const p = {
+        id: r.category_id+'_'+i,
+        name: r.name||'',
+        brand: r.brand||'',
+        price: parseFloat(r.price)||0,
+        cost: parseFloat(r.cost)||0,
+      };
+      if(!PRODUCTS[r.category_id]) PRODUCTS[r.category_id]=[];
+      PRODUCTS[r.category_id].push(p);
+    });
+
+    currentCat = CATS[0]?.id||'';
+    compareCat = currentCat;
+
+    // 화면 렌더링
+    renderCatTabs('catTabs',currentCat,'switchCat');
+    renderPresets();
+    renderProducts();
+    renderSummary();
+    renderAdjList();
+    showLoading('');
+    document.getElementById('loadingBar').style.display='none';
+
+  } catch(e) {
+    // Sheets 실패 시 localStorage 데이터로 폴백
+    CATS = load('dm_cats', DEFAULT_CATS);
+    PRODUCTS = load('dm_products', DEFAULT_PRODUCTS);
+    currentCat = CATS[0]?.id||'drum';
+    compareCat = currentCat;
+    renderCatTabs('catTabs',currentCat,'switchCat');
+    renderPresets();
+    renderProducts();
+    renderSummary();
+    renderAdjList();
+    showLoading('');
+    document.getElementById('loadingBar').style.display='none';
+    console.warn('Sheets 연동 실패, 로컬 데이터 사용:', e);
+  }
+}
 
 /* ══ UTILS ══ */
 function fmt(v){return '₩'+Math.round(v).toLocaleString('ko-KR');}
@@ -476,7 +577,7 @@ function findP(id){for(const c of Object.values(PRODUCTS)){const p=c.find(x=>x.i
 /* ══ TOP NAV ══ */
 function switchTop(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['quote','compare','manage','presetmanage','catmanage'].indexOf(v)===i));
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>b.classList.toggle('active',['quote','compare','presetmanage'].indexOf(v)===i));
   const el=document.getElementById(v+'View');
   if(el)el.classList.add('active');
   if(v==='manage'){editBuffer=JSON.parse(JSON.stringify(PRODUCTS));renderManage();}
@@ -927,14 +1028,32 @@ function savePresets(){
   const b=document.getElementById('presetSaveBadge');b.style.display='inline';setTimeout(()=>b.style.display='none',2000);
 }
 
+/* ══ PASSWORD ══ */
+const PASSWORD = '1234';
+function checkPassword(){
+  const val=document.getElementById('lockInput').value;
+  if(val===PASSWORD){
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('lockInput').value='';
+  } else {
+    document.getElementById('lockError').textContent='비밀번호가 틀렸습니다.';
+    document.getElementById('lockInput').value='';
+    document.getElementById('lockInput').focus();
+    setTimeout(()=>document.getElementById('lockError').textContent='',2000);
+  }
+}
+
+/* ══ RELOAD SHEETS ══ */
+function reloadSheets(){
+  document.getElementById('loadingBar').style.display='block';
+  loadFromSheets();
+}
+
 /* ══ INIT ══ */
 document.getElementById('quoteDate').value=todayStr();
 document.getElementById('discountPct').addEventListener('input',renderSummary);
-renderCatTabs('catTabs',currentCat,'switchCat');
-renderPresets();
-renderProducts();
-renderSummary();
-renderAdjList();
+setTimeout(()=>document.getElementById('lockInput').focus(),100);
+loadFromSheets();
 </script>
 </body>
 </html>
