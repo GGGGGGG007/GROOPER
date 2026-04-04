@@ -58,7 +58,8 @@ textarea{resize:vertical;min-height:60px;}
 .mode-tab.active{background:var(--accent);color:#fff;}
 
 /* CAT TABS */
-.cat-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.cat-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;}
+.cat-scroll::-webkit-scrollbar{display:none;}
 .cat-tabs{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
 .cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);background:#fff;cursor:pointer;white-space:nowrap;color:var(--text2);font-family:inherit;}
 .cat-tab.active{background:var(--accent);color:#fff;border-color:transparent;}
@@ -78,7 +79,8 @@ textarea{resize:vertical;min-height:60px;}
 .qnum{font-size:13px;font-weight:700;min-width:18px;text-align:center;}
 
 /* PRESET */
-.preset-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.preset-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;}
+.preset-scroll::-webkit-scrollbar{display:none;}
 .preset-row{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
 .preset-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--green);background:var(--green-light);cursor:pointer;white-space:nowrap;color:var(--green);font-family:inherit;}
 .preset-btn:hover{background:var(--green);color:#fff;}
@@ -713,7 +715,9 @@ function calcFinal(subtotal, retailTotal, costTotal, discPct, marginPct, adjArr)
   const discAmt=Math.round(subtotal*discPct/100);
   const marginAmt=Math.round(costTotal*marginPct/100);
   let adjTotal=0;adjArr.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  const final=Math.max(0, subtotal - discAmt + marginAmt + adjTotal);
+  // 마진 모드면 원가 기준, 할인 모드면 소매가 기준
+  const base = marginPct>0 ? costTotal : subtotal;
+  const final=Math.max(0, base - discAmt + marginAmt + adjTotal);
   return {final, discAmt, marginAmt, adjTotal};
 }
 
@@ -742,12 +746,15 @@ function renderSummary(){
   const mgnLbl=document.getElementById('marginAmtLabel');
   if(mgnLbl)mgnLbl.textContent=marginPct>0?`+${fmt(marginAmt)}`:'';
 
-  const profit=final-totalCost;
-  const rate=final>0?profit/final*100:0;
+  // 수익률은 추가항목 제외한 현금가 기준
+  const base = marginPct>0 ? totalCost : subtotal;
+  const cashPrice = Math.max(0, base - discAmt + marginAmt);
+  const profit=cashPrice-totalCost;
+  const rate=cashPrice>0?profit/cashPrice*100:0;
 
   document.getElementById('totalPrice').textContent=fmt(final);
   document.getElementById('statRetailRef').textContent=fmt(retailTotal);
-  document.getElementById('statRetail').textContent=fmt(final);
+  document.getElementById('statRetail').textContent=fmt(cashPrice);
   document.getElementById('statCost').textContent=fmt(totalCost);
   const pEl=document.getElementById('statProfit');
   pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
@@ -886,10 +893,13 @@ function renderCompareSummary(){
   const discPct=parseFloat(document.getElementById('cmpDiscountPct')?.value)||0;
   const marginPct=parseFloat(document.getElementById('cmpMarginPct')?.value)||0;
   const {final}=calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems);
-  const profit=final-cost;const rate=final>0?profit/final*100:0;
+  // 수익률은 추가항목 제외한 현금가 기준
+  const cmpBase=marginPct>0?cost:sub;
+  const {final:cashPrice}=calcFinal(sub,retail,cost,discPct,marginPct,[]);
+  const profit=cashPrice-cost;const rate=cashPrice>0?profit/cashPrice*100:0;
   document.getElementById('compareTotal').textContent=fmt(final);
   document.getElementById('cmpRetailRef').textContent=fmt(retail);
-  document.getElementById('cmpStatRetail').textContent=fmt(final);
+  document.getElementById('cmpStatRetail').textContent=fmt(cashPrice);
   document.getElementById('cmpStatCost').textContent=fmt(cost);
   const pEl=document.getElementById('cmpStatProfit');
   pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
