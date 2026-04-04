@@ -92,7 +92,7 @@ textarea{resize:vertical;min-height:60px;}
 .sum-price{font-weight:500;text-align:right;min-width:80px;}
 .divider{border-top:1px solid var(--border2);margin:8px 0;}
 .total-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
-.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;}
+.stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px;}
 .stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 8px;}
 .slabel{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
 .sval{font-size:13px;font-weight:700;}
@@ -289,6 +289,7 @@ textarea{resize:vertical;min-height:60px;}
       <div class="stat"><div class="slabel">원가</div><div class="sval blue" id="statCost">₩0</div></div>
       <div class="stat"><div class="slabel">순이익</div><div class="sval green" id="statProfit">₩0</div></div>
       <div class="stat"><div class="slabel">수익률</div><div class="sval green" id="statMargin">0%</div></div>
+      <div class="stat"><div class="slabel">할인율</div><div class="sval" id="statDiscount">-</div></div>
     </div>
     <div class="action-row" style="margin-top:14px;">
       <button class="btn" onclick="resetAll()">초기화</button>
@@ -309,52 +310,41 @@ textarea{resize:vertical;min-height:60px;}
     <div style="font-size:11px;color:var(--text3);margin-bottom:8px;" id="planModeLabel"></div>
     <div class="cat-scroll"><div class="cat-tabs" id="compareCatTabs"></div></div>
     <div id="compareProductArea"></div>
-    <div style="margin-top:8px;">
-      <div id="compareSummaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div></div>
-
-      <!-- 할인 / 마진 공통 -->
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 8px;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:13px;color:var(--text2);white-space:nowrap;">할인</span>
-          <input type="number" id="cmpDiscountPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSummary();renderCompareSlides()"/>
-          <span style="font-size:13px;color:var(--text2);">%</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:13px;color:var(--text2);white-space:nowrap;">마진</span>
-          <input type="number" id="cmpMarginPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSummary();renderCompareSlides()"/>
-          <span style="font-size:13px;color:var(--text2);">%</span>
-        </div>
-      </div>
-
-      <!-- 추가 항목 -->
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">추가 항목</div>
-      <div id="cmpAdjList"></div>
-      <button class="add-btn" onclick="addCmpAdj()">+ 항목 추가</button>
-
-      <div class="divider"></div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;">
-        <span style="font-size:12px;color:var(--text3);">정가 합계</span>
-        <span style="font-size:12px;color:var(--text3);" id="cmpRetailRef">₩0</span>
-      </div>
-      <div class="total-row">
-        <span style="font-size:14px;font-weight:700;">최종 금액</span>
-        <span style="font-size:18px;font-weight:700;color:var(--green);" id="compareTotal">₩0</span>
-      </div>
-      <div class="stat-grid">
-        <div class="stat"><div class="slabel">판매가</div><div class="sval amber" id="cmpStatRetail">₩0</div></div>
-        <div class="stat"><div class="slabel">원가</div><div class="sval blue" id="cmpStatCost">₩0</div></div>
-        <div class="stat"><div class="slabel">순이익</div><div class="sval green" id="cmpStatProfit">₩0</div></div>
-        <div class="stat"><div class="slabel">수익률</div><div class="sval green" id="cmpStatMargin">0%</div></div>
-      </div>
-    </div>
   </div>
 
   <div class="card">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;">전체 안 비교</div>
-    <div class="compare-outer" id="compareOuter">
-      <div class="compare-track" id="compareTrack"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:13px;font-weight:700;">전체 안 비교</span>
+      <div style="display:flex;gap:6px;font-size:12px;color:var(--text3);">
+        <span id="cmpSlideLabel">A안</span>
+      </div>
     </div>
-    <div class="compare-dots" id="compareDots"></div>
+
+    <!-- 공통 할인/마진 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap;">할인</span>
+        <input type="number" id="cmpDiscountPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSlides()"/>
+        <span style="font-size:13px;color:var(--text2);">%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap;">마진</span>
+        <input type="number" id="cmpMarginPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSlides()"/>
+        <span style="font-size:13px;color:var(--text2);">%</span>
+      </div>
+    </div>
+
+    <!-- 추가 항목 -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">추가 항목</div>
+    <div id="cmpAdjList"></div>
+    <button class="add-btn" onclick="addCmpAdj()">+ 항목 추가</button>
+
+    <div style="margin-top:12px;">
+      <div class="compare-outer" id="compareOuter">
+        <div class="compare-track" id="compareTrack"></div>
+      </div>
+      <div class="compare-dots" id="compareDots"></div>
+    </div>
   </div>
 </div>
 
@@ -618,7 +608,7 @@ function switchTop(v){
   if(v==='manage'){editBuffer=JSON.parse(JSON.stringify(PRODUCTS));renderManage();}
   if(v==='catmanage'){catEditBuffer=JSON.parse(JSON.stringify(CATS));renderCatManage();}
   if(v==='presetmanage'){presetEditBuffer=JSON.parse(JSON.stringify(PRESETS));currentEditPreset=0;renderPresetManage();}
-  if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();renderCmpAdjList();setTimeout(initSwipe,100);}
+  if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSlides();renderCmpAdjList();setTimeout(initSwipe,100);}
 }
 
 /* ══ CAT TABS ══ */
@@ -754,6 +744,18 @@ function renderSummary(){
   pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
   const mEl=document.getElementById('statMargin');
   mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
+  // 할인율: 마진% 적용 시에만 소매가 대비 할인율 표시
+  const dEl=document.getElementById('statDiscount');
+  if(dEl){
+    if(marginPct>0&&retailTotal>0){
+      const discRate=(retailTotal-cashPrice)/retailTotal*100;
+      dEl.textContent=pct(discRate);
+      dEl.className='sval red';
+    } else {
+      dEl.textContent='-';
+      dEl.className='sval';
+    }
+  }
 }
 
 /* ══ RESET ══ */
@@ -862,12 +864,12 @@ function toggleCompareP(id){
   const p=findP(id);if(!p)return;
   const sel=plans[currentPlan].selected;
   if(sel[id])delete sel[id];else sel[id]={...p,qty:1};
-  renderCompareProducts();renderCompareSummary();renderCompareSlides();
+  renderCompareProducts();renderCompareSlides();
 }
 function chgCompareQty(id,d){
   const sel=plans[currentPlan].selected;
   if(!sel[id])return;sel[id].qty=Math.max(1,sel[id].qty+d);
-  renderCompareProducts();renderCompareSummary();renderCompareSlides();
+  renderCompareProducts();renderCompareSlides();
 }
 function renderCompareSummary(){
   const items=Object.values(plans[currentPlan].selected);
@@ -902,6 +904,7 @@ function renderCompareSummary(){
 function renderCompareSlides(){
   const track=document.getElementById('compareTrack');
   const dots=document.getElementById('compareDots');
+  const label=document.getElementById('cmpSlideLabel');
   const discPct=parseFloat(document.getElementById('cmpDiscountPct')?.value)||0;
   const marginPct=parseFloat(document.getElementById('cmpMarginPct')?.value)||0;
   track.innerHTML=PLAN_LABELS.map((l,i)=>{
@@ -912,20 +915,26 @@ function renderCompareSlides(){
     const {final:cashPrice}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,[]):{final:0};
     const profit=cashPrice-cost;
     const rate=cashPrice>0?profit/cashPrice*100:0;
+    const discRate=marginPct>0&&retail>0?(retail-cashPrice)/retail*100:null;
     return `<div class="compare-slide">
       <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
       ${rows}
-      ${items.length?`<div class="divider"></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);padding:2px 0;"><span>정가</span><span>${fmt(retail)}</span></div>
-      <div class="total-row"><span style="font-size:13px;font-weight:700;">최종</span><span style="font-size:15px;font-weight:700;color:var(--green);">${fmt(final)}</span></div>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <div class="stat" style="flex:1;padding:6px 8px;"><div class="slabel">순이익</div><div class="sval ${profit>=0?'green':'red'}" style="font-size:12px;">${(profit>=0?'+':'')+fmt(profit)}</div></div>
-        <div class="stat" style="flex:1;padding:6px 8px;"><div class="slabel">수익률</div><div class="sval ${rate>=0?'green':'red'}" style="font-size:12px;">${pct(rate)}</div></div>
+      ${items.length?`
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);padding:2px 0;"><span>정가 합계</span><span>${fmt(retail)}</span></div>
+      <div class="total-row"><span style="font-size:13px;font-weight:700;">최종 금액</span><span style="font-size:16px;font-weight:700;color:var(--green);">${fmt(final)}</span></div>
+      <div class="stat-grid" style="margin-top:8px;">
+        <div class="stat" style="padding:6px 8px;"><div class="slabel">판매가</div><div class="sval amber" style="font-size:12px;">${fmt(cashPrice)}</div></div>
+        <div class="stat" style="padding:6px 8px;"><div class="slabel">원가</div><div class="sval blue" style="font-size:12px;">${fmt(cost)}</div></div>
+        <div class="stat" style="padding:6px 8px;"><div class="slabel">순이익</div><div class="sval ${profit>=0?'green':'red'}" style="font-size:12px;">${(profit>=0?'+':'')+fmt(profit)}</div></div>
+        <div class="stat" style="padding:6px 8px;"><div class="slabel">수익률</div><div class="sval ${rate>=0?'green':'red'}" style="font-size:12px;">${pct(rate)}</div></div>
+        <div class="stat" style="padding:6px 8px;"><div class="slabel">할인율</div><div class="sval ${discRate!==null?'red':''}" style="font-size:12px;">${discRate!==null?pct(discRate):'-'}</div></div>
       </div>`:''}
     </div>`;
   }).join('');
   dots.innerHTML=PLAN_LABELS.map((_,i)=>`<button class="compare-dot${i===compareSlide?' active':''}" onclick="goSlide(${i})"></button>`).join('');
   track.style.transform=`translateX(-${compareSlide*100}%)`;
+  if(label)label.textContent=PLAN_LABELS[compareSlide]+'안';
 }
 function goSlide(i){compareSlide=i;renderCompareSlides();}
 function slideCompare(d){compareSlide=Math.max(0,Math.min(4,compareSlide+d));renderCompareSlides();}
