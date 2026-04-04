@@ -674,7 +674,7 @@ function chgQty(id,d){
 }
 
 /* ══ ADJ ══ */
-function addAdj(){adjItems.push({label:'카드수수료',type:'minus',value:0});renderAdjList();renderSummary();}
+function addAdj(){adjItems.push({label:'출장비',type:'minus',value:0});renderAdjList();renderSummary();}
 function removeAdj(i){adjItems.splice(i,1);renderAdjList();renderSummary();}
 function updateAdj(i,f,v){adjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderSummary();}
 function renderAdjList(){
@@ -693,7 +693,7 @@ function renderAdjList(){
 
 /* 비교 추가 항목 */
 let cmpAdjItems=[];
-function addCmpAdj(){cmpAdjItems.push({label:'카드수수료',type:'minus',value:0});renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
+function addCmpAdj(){cmpAdjItems.push({label:'출장비',type:'minus',value:0});renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
 function removeCmpAdj(i){cmpAdjItems.splice(i,1);renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
 function updateCmpAdj(i,f,v){cmpAdjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderCompareSummary();renderCompareSlides();}
 function renderCmpAdjList(){
