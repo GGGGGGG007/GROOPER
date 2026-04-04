@@ -355,10 +355,6 @@ textarea{resize:vertical;min-height:60px;}
       <div class="compare-track" id="compareTrack"></div>
     </div>
     <div class="compare-dots" id="compareDots"></div>
-    <div style="display:flex;gap:8px;margin-top:4px;">
-      <button class="btn full" onclick="slideCompare(-1)">← 이전</button>
-      <button class="btn full" onclick="slideCompare(1)">다음 →</button>
-    </div>
   </div>
 </div>
 
@@ -622,7 +618,7 @@ function switchTop(v){
   if(v==='manage'){editBuffer=JSON.parse(JSON.stringify(PRODUCTS));renderManage();}
   if(v==='catmanage'){catEditBuffer=JSON.parse(JSON.stringify(CATS));renderCatManage();}
   if(v==='presetmanage'){presetEditBuffer=JSON.parse(JSON.stringify(PRESETS));currentEditPreset=0;renderPresetManage();}
-  if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();}
+  if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();renderCmpAdjList();setTimeout(initSwipe,100);}
 }
 
 /* ══ CAT TABS ══ */
@@ -674,7 +670,7 @@ function chgQty(id,d){
 }
 
 /* ══ ADJ ══ */
-function addAdj(){adjItems.push({label:'출장비',type:'minus',value:0});renderAdjList();renderSummary();}
+function addAdj(){adjItems.push({label:'출장비',type:'plus',value:0});renderAdjList();renderSummary();}
 function removeAdj(i){adjItems.splice(i,1);renderAdjList();renderSummary();}
 function updateAdj(i,f,v){adjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderSummary();}
 function renderAdjList(){
@@ -693,7 +689,7 @@ function renderAdjList(){
 
 /* 비교 추가 항목 */
 let cmpAdjItems=[];
-function addCmpAdj(){cmpAdjItems.push({label:'출장비',type:'minus',value:0});renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
+function addCmpAdj(){cmpAdjItems.push({label:'출장비',type:'plus',value:0});renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
 function removeCmpAdj(i){cmpAdjItems.splice(i,1);renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
 function updateCmpAdj(i,f,v){cmpAdjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderCompareSummary();renderCompareSlides();}
 function renderCmpAdjList(){
@@ -916,7 +912,8 @@ function renderCompareSlides(){
     let sub=0,cost=0,retail=0;
     const rows=items.length?items.map(it=>{const lp=it.price*it.qty;sub+=lp;cost+=(it.cost||0)*it.qty;retail+=it.price*it.qty;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">항목 없음</div>';
     const {final}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems):{final:0};
-    const profit=final-cost;const rate=final>0?profit/final*100:0;
+    const {final:cashPrice}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,[]):{final:0};
+    const profit=cashPrice-cost;const rate=cashPrice>0?profit/cashPrice*100:0;
     return `<div class="compare-slide">
       <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
       ${rows}
@@ -934,6 +931,23 @@ function renderCompareSlides(){
 }
 function goSlide(i){compareSlide=i;renderCompareSlides();}
 function slideCompare(d){compareSlide=Math.max(0,Math.min(4,compareSlide+d));renderCompareSlides();}
+
+/* 스와이프 이벤트 */
+function initSwipe(){
+  const outer=document.getElementById('compareOuter');
+  if(!outer)return;
+  let startX=0,startY=0,isDragging=false;
+  outer.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;isDragging=true;},{passive:true});
+  outer.addEventListener('touchend',e=>{
+    if(!isDragging)return;
+    const dx=e.changedTouches[0].clientX-startX;
+    const dy=e.changedTouches[0].clientY-startY;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      slideCompare(dx<0?1:-1);
+    }
+    isDragging=false;
+  },{passive:true});
+}
 function clearAllPlans(){
   if(!confirm('모든 견적안을 초기화할까요?'))return;
   PLAN_LABELS.forEach((_,i)=>{plans[i].selected={};});
