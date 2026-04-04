@@ -17,7 +17,7 @@
   --blue:#1a5fa8;--blue-light:#eaf1fb;
   --accent:#2c2c2c;--radius:10px;--radius-sm:6px;
 }
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;overscroll-behavior-y:contain;}
 
 /* NAV */
 .nav{background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:52px;position:sticky;top:0;z-index:100;}
@@ -90,13 +90,14 @@ textarea{resize:vertical;min-height:60px;}
 .sum-price{font-weight:500;text-align:right;min-width:80px;}
 .divider{border-top:1px solid var(--border2);margin:8px 0;}
 .total-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;}
-.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
-.stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;}
+.stat{background:var(--bg);border-radius:var(--radius-sm);padding:10px 8px;}
 .slabel{font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
-.sval{font-size:15px;font-weight:700;}
+.sval{font-size:13px;font-weight:700;}
 .sval.green{color:var(--green);}
 .sval.red{color:var(--red);}
 .sval.blue{color:var(--blue);}
+.sval.amber{color:#854F0B;}
 
 /* ADJ */
 .adj-item{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
@@ -224,10 +225,6 @@ textarea{resize:vertical;min-height:60px;}
 @keyframes loading{0%{width:0%;margin-left:0;}50%{width:60%;margin-left:20%;}100%{width:0%;margin-left:100%;}}
 </style>
 <div class="view active" id="quoteView">
-  <div class="mode-tabs">
-    <button class="mode-tab active" onclick="switchMode('retail')">소매 견적</button>
-    <button class="mode-tab" onclick="switchMode('wholesale')">도매 견적</button>
-  </div>
 
   <div class="card">
     <div class="card-title">수신처 정보</div>
@@ -252,32 +249,42 @@ textarea{resize:vertical;min-height:60px;}
   <div class="card">
     <div class="card-title">견적 내역</div>
     <div id="summaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div></div>
-    <div id="retailOptions">
-      <div style="height:8px;"></div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">추가 항목</div>
-      <div id="adjList"></div>
-      <button class="add-btn" onclick="addAdj()">+ 항목 추가 (카드수수료·출장비 등)</button>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+
+    <div style="height:8px;"></div>
+    <!-- 할인 / 마진 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
         <span style="font-size:13px;color:var(--text2);white-space:nowrap;">할인</span>
-        <input type="number" id="discountPct" value="0" min="0" max="100" style="width:70px;" oninput="renderSummary()"/>
+        <input type="number" id="discountPct" value="0" min="0" max="100" style="width:65px;" oninput="renderSummary()"/>
         <span style="font-size:13px;color:var(--text2);">%</span>
+        <span id="discountAmtLabel" style="font-size:11px;color:var(--red);"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap;">마진</span>
+        <input type="number" id="wholesaleMargin" value="0" min="0" max="100" style="width:65px;" oninput="renderSummary()"/>
+        <span style="font-size:13px;color:var(--text2);">%</span>
+        <span id="marginAmtLabel" style="font-size:11px;color:var(--green);"></span>
       </div>
     </div>
-    <div id="wholesaleOptions" style="display:none;">
-      <div style="height:8px;"></div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;color:var(--text2);">원가에</span>
-        <input type="number" id="wholesaleMargin" value="12" min="0" max="100" style="width:65px;" oninput="renderProducts();renderSummary()"/>
-        <span style="font-size:13px;color:var(--text2);">% 추가</span>
-      </div>
-    </div>
+
+    <!-- 추가 항목 -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">추가 항목</div>
+    <div id="adjList"></div>
+    <button class="add-btn" onclick="addAdj()">+ 항목 추가 (카드수수료·출장비 등)</button>
+
     <div class="divider"></div>
+    <!-- 정가 합계 -->
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;">
+      <span style="font-size:12px;color:var(--text3);">정가 합계</span>
+      <span style="font-size:12px;color:var(--text3);" id="statRetailRef">₩0</span>
+    </div>
     <div class="total-row">
       <span style="font-size:15px;font-weight:700;">최종 금액</span>
       <span style="font-size:22px;font-weight:700;color:var(--green);" id="totalPrice">₩0</span>
     </div>
     <div class="stat-grid">
-      <div class="stat"><div class="slabel">원가 합계</div><div class="sval blue" id="statCost">₩0</div></div>
+      <div class="stat"><div class="slabel">판매가</div><div class="sval amber" id="statRetail">₩0</div></div>
+      <div class="stat"><div class="slabel">원가</div><div class="sval blue" id="statCost">₩0</div></div>
       <div class="stat"><div class="slabel">순이익</div><div class="sval green" id="statProfit">₩0</div></div>
       <div class="stat"><div class="slabel">수익률</div><div class="sval green" id="statMargin">0%</div></div>
     </div>
@@ -302,10 +309,40 @@ textarea{resize:vertical;min-height:60px;}
     <div id="compareProductArea"></div>
     <div style="margin-top:8px;">
       <div id="compareSummaryItems"><div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div></div>
+
+      <!-- 할인 / 마진 공통 -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:13px;color:var(--text2);white-space:nowrap;">할인</span>
+          <input type="number" id="cmpDiscountPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSummary();renderCompareSlides()"/>
+          <span style="font-size:13px;color:var(--text2);">%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:13px;color:var(--text2);white-space:nowrap;">마진</span>
+          <input type="number" id="cmpMarginPct" value="0" min="0" max="100" style="width:65px;" oninput="renderCompareSummary();renderCompareSlides()"/>
+          <span style="font-size:13px;color:var(--text2);">%</span>
+        </div>
+      </div>
+
+      <!-- 추가 항목 -->
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">추가 항목</div>
+      <div id="cmpAdjList"></div>
+      <button class="add-btn" onclick="addCmpAdj()">+ 항목 추가</button>
+
       <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;">
+        <span style="font-size:12px;color:var(--text3);">정가 합계</span>
+        <span style="font-size:12px;color:var(--text3);" id="cmpRetailRef">₩0</span>
+      </div>
       <div class="total-row">
-        <span style="font-size:14px;font-weight:700;">합계</span>
+        <span style="font-size:14px;font-weight:700;">최종 금액</span>
         <span style="font-size:18px;font-weight:700;color:var(--green);" id="compareTotal">₩0</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="slabel">판매가</div><div class="sval amber" id="cmpStatRetail">₩0</div></div>
+        <div class="stat"><div class="slabel">원가</div><div class="sval blue" id="cmpStatCost">₩0</div></div>
+        <div class="stat"><div class="slabel">순이익</div><div class="sval green" id="cmpStatProfit">₩0</div></div>
+        <div class="stat"><div class="slabel">수익률</div><div class="sval green" id="cmpStatMargin">0%</div></div>
       </div>
     </div>
   </div>
@@ -493,7 +530,7 @@ let CATS=[];
 let PRODUCTS={};
 let PRESETS=load('dm_presets',DEFAULT_PRESETS);
 
-let selected={}, currentCat='', quoteMode='retail', adjItems=[];
+let selected={}, currentCat='', adjItems=[];
 let editBuffer={}, catEditBuffer=[];
 
 /* 비교 안 A~E */
@@ -586,15 +623,6 @@ function switchTop(v){
   if(v==='compare'){renderPlanTabs();renderCompareCatTabs();renderCompareProducts();renderCompareSummary();renderCompareSlides();}
 }
 
-/* ══ MODE ══ */
-function switchMode(m){
-  quoteMode=m;
-  document.querySelectorAll('.mode-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&m==='retail')||(i===1&&m==='wholesale')));
-  document.getElementById('retailOptions').style.display=m==='retail'?'':'none';
-  document.getElementById('wholesaleOptions').style.display=m==='wholesale'?'':'none';
-  renderProducts();renderSummary();
-}
-
 /* ══ CAT TABS ══ */
 function renderCatTabs(containerId,current,clickFn){
   const el=document.getElementById(containerId);if(!el)return;
@@ -619,15 +647,12 @@ function applyPreset(i){
 function renderProducts(){
   renderCatTabs('catTabs',currentCat,'switchCat');
   const prods=PRODUCTS[currentCat]||[];
-  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   document.getElementById('productArea').innerHTML=`<div class="product-grid">${prods.map(p=>{
     const sel=selected[p.id];
-    const up=quoteMode==='wholesale'?Math.round((p.cost||0)*(1+margin/100)):p.price;
     return `<div class="pcard${sel?' sel':''}" onclick="toggleP('${p.id}')">
       <div class="pname">${p.name}</div>
       <div class="pbrand">${p.brand}</div>
-      <div class="pprice">${quoteMode==='wholesale'?'도매: ':'소매: '}${fmt(up)}</div>
-      ${quoteMode==='retail'&&p.cost?`<div class="pcost">원가: ${fmt(p.cost)}</div>`:''}
+      <div class="pprice">₩${Math.round(p.price).toLocaleString('ko-KR')}</div>
       ${sel?`<div class="qty-row" onclick="event.stopPropagation()">
         <button class="qbtn" onclick="chgQty('${p.id}',-1)">−</button>
         <div class="qnum">${sel.qty}</div>
@@ -664,39 +689,65 @@ function renderAdjList(){
     </div>`).join('');
 }
 
-/* ══ SUMMARY ══ */
-function calcTotal(selObj){
-  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
-  let subtotal=0,totalCost=0;
-  Object.values(selObj).forEach(it=>{
-    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-    subtotal+=up*it.qty;totalCost+=(it.cost||0)*it.qty;
-  });
-  return{subtotal,totalCost};
+/* 비교 추가 항목 */
+let cmpAdjItems=[];
+function addCmpAdj(){cmpAdjItems.push({label:'카드수수료',type:'minus',value:0});renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
+function removeCmpAdj(i){cmpAdjItems.splice(i,1);renderCmpAdjList();renderCompareSummary();renderCompareSlides();}
+function updateCmpAdj(i,f,v){cmpAdjItems[i][f]=f==='value'?parseFloat(v)||0:v;renderCompareSummary();renderCompareSlides();}
+function renderCmpAdjList(){
+  const el=document.getElementById('cmpAdjList');if(!el)return;
+  el.innerHTML=cmpAdjItems.map((a,i)=>`
+    <div class="adj-item">
+      <input type="text" value="${a.label}" placeholder="항목명" oninput="updateCmpAdj(${i},'label',this.value)"/>
+      <select onchange="updateCmpAdj(${i},'type',this.value)">
+        <option value="minus"${a.type==='minus'?' selected':''}>− 차감</option>
+        <option value="plus"${a.type==='plus'?' selected':''}>+ 추가</option>
+      </select>
+      <input type="number" value="${a.value}" placeholder="0" oninput="updateCmpAdj(${i},'value',this.value)"/>
+      <button class="btn icon" onclick="removeCmpAdj(${i})" style="background:var(--red-light);color:var(--red);border:none;">×</button>
+    </div>`).join('');
 }
+
+/* ══ SUMMARY ══ */
+function calcFinal(subtotal, retailTotal, costTotal, discPct, marginPct, adjArr){
+  const discAmt=Math.round(subtotal*discPct/100);
+  const marginAmt=Math.round(costTotal*marginPct/100);
+  let adjTotal=0;adjArr.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
+  const final=Math.max(0, subtotal - discAmt + marginAmt + adjTotal);
+  return {final, discAmt, marginAmt, adjTotal};
+}
+
 function renderSummary(){
   const items=Object.values(selected);
   const el=document.getElementById('summaryItems');if(!el)return;
-  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
-  let subtotal=0,totalCost=0;
+  let subtotal=0,totalCost=0,retailTotal=0;
   if(!items.length){
     el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">선택된 항목이 없습니다</div>';
   } else {
     el.innerHTML=items.map(it=>{
-      const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-      const lp=up*it.qty;subtotal+=lp;totalCost+=(it.cost||0)*it.qty;
+      const lp=it.price*it.qty;
+      subtotal+=lp;totalCost+=(it.cost||0)*it.qty;retailTotal+=it.price*it.qty;
       return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;
     }).join('');
   }
   totalCost=0;items.forEach(it=>{totalCost+=(it.cost||0)*it.qty;});
-  let adjTotal=0;
+  retailTotal=0;items.forEach(it=>{retailTotal+=it.price*it.qty;});
+
   const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
-  const discAmt=Math.round(subtotal*discPct/100);
-  if(quoteMode==='retail') adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  const final=Math.max(0,subtotal-discAmt+adjTotal);
+  const marginPct=parseFloat(document.getElementById('wholesaleMargin')?.value)||0;
+  const {final, discAmt, marginAmt}=calcFinal(subtotal,retailTotal,totalCost,discPct,marginPct,adjItems);
+
+  const discLbl=document.getElementById('discountAmtLabel');
+  if(discLbl)discLbl.textContent=discPct>0?`-${fmt(discAmt)}`:'';
+  const mgnLbl=document.getElementById('marginAmtLabel');
+  if(mgnLbl)mgnLbl.textContent=marginPct>0?`+${fmt(marginAmt)}`:'';
+
   const profit=final-totalCost;
   const rate=final>0?profit/final*100:0;
+
   document.getElementById('totalPrice').textContent=fmt(final);
+  document.getElementById('statRetailRef').textContent=fmt(retailTotal);
+  document.getElementById('statRetail').textContent=fmt(final);
   document.getElementById('statCost').textContent=fmt(totalCost);
   const pEl=document.getElementById('statProfit');
   pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
@@ -710,6 +761,9 @@ function resetAll(){
   ['custCompany','custName','custPhone','custAddr','custNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('quoteDate').value=todayStr();
   document.getElementById('discountPct').value='0';
+  document.getElementById('wholesaleMargin').value='0';
+  const dl=document.getElementById('discountAmtLabel');if(dl)dl.textContent='';
+  const ml=document.getElementById('marginAmtLabel');if(ml)ml.textContent='';
   renderAdjList();renderProducts();renderSummary();
 }
 
@@ -719,24 +773,20 @@ function buildText(){
   const name=document.getElementById('custName')?.value||'고객';
   const phone=document.getElementById('custPhone')?.value||'';
   const date=document.getElementById('quoteDate')?.value||todayStr();
-  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   const items=Object.values(selected);
   const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
-  let subtotal=0,lines='';
-  items.forEach(it=>{
-    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-    const lp=up*it.qty;subtotal+=lp;
-    lines+=`${it.brand} ${it.name} ×${it.qty}  ${fmt(lp)}\n`;
-  });
-  const discAmt=Math.round(subtotal*discPct/100);
-  let adjTotal=0,adjLines='';
-  adjItems.forEach(a=>{const v=a.value||0;const s=a.type==='plus'?1:-1;adjTotal+=s*v;if(v>0)adjLines+=`${a.label}: ${a.type==='plus'?'+':'-'}${fmt(v)}\n`;});
-  const final=Math.max(0,subtotal-discAmt+adjTotal);
+  const marginPct=parseFloat(document.getElementById('wholesaleMargin')?.value)||0;
+  let subtotal=0,totalCost=0,lines='';
+  items.forEach(it=>{const lp=it.price*it.qty;subtotal+=lp;totalCost+=(it.cost||0)*it.qty;lines+=`${it.brand} ${it.name} ×${it.qty}  ${fmt(lp)}\n`;});
+  const {final,discAmt,marginAmt}=calcFinal(subtotal,subtotal,totalCost,discPct,marginPct,adjItems);
+  let adjLines='';adjItems.forEach(a=>{const v=a.value||0;if(v>0)adjLines+=`${a.label}: ${a.type==='plus'?'+':'-'}${fmt(v)}\n`;});
   let txt=`🥁 드럼몬스터 견적서\n발행일: ${fmtDateKo(date)}\n━━━━━━━━━━━━━━\n`;
   if(company)txt+=`거래처: ${company}\n`;
-  txt+=`담당자: ${name}`;if(phone)txt+=` / ${phone}`;txt+=`\n━━━━━━━━━━━━━━\n${lines}`;
-  if(discPct>0||adjLines){txt+=`━━━━━━━━━━━━━━\n소계: ${fmt(subtotal)}\n`;if(discPct>0)txt+=`할인(${discPct}%): -${fmt(discAmt)}\n`;if(adjLines)txt+=adjLines;}
-  txt+=`━━━━━━━━━━━━━━\n합계: ${fmt(final)}\n\n드럼몬스터 / 한정수`;
+  txt+=`담당자: ${name}`;if(phone)txt+=` / ${phone}`;txt+=`\n━━━━━━━━━━━━━━\n${lines}━━━━━━━━━━━━━━\n소계: ${fmt(subtotal)}\n`;
+  if(discPct>0)txt+=`할인(${discPct}%): -${fmt(discAmt)}\n`;
+  if(marginPct>0)txt+=`마진(${marginPct}%): +${fmt(marginAmt)}\n`;
+  if(adjLines)txt+=adjLines;
+  txt+=`합계: ${fmt(final)}\n\n드럼몬스터 / 한정수`;
   return txt;
 }
 function copyText(){
@@ -752,32 +802,25 @@ function showPrint(){
   const addr=document.getElementById('custAddr')?.value||'';
   const note=document.getElementById('custNote')?.value||'';
   const date=document.getElementById('quoteDate')?.value||todayStr();
-  const margin=parseInt(document.getElementById('wholesaleMargin')?.value)||12;
   const items=Object.values(selected);
   const discPct=parseFloat(document.getElementById('discountPct')?.value)||0;
+  const marginPct=parseFloat(document.getElementById('wholesaleMargin')?.value)||0;
   document.getElementById('printDate').textContent='발행일: '+fmtDateKo(date);
-  let sub=0;
-  items.forEach(it=>{const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;sub+=up*it.qty;});
-  const discAmt=Math.round(sub*discPct/100);
-  let adjTotal=0;adjItems.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  const finalTotal=Math.max(0,sub-discAmt+adjTotal);
+  let sub=0,cost=0;
+  items.forEach(it=>{sub+=it.price*it.qty;cost+=(it.cost||0)*it.qty;});
+  const {final,discAmt,marginAmt}=calcFinal(sub,sub,cost,discPct,marginPct,adjItems);
   document.getElementById('receiverTable').innerHTML=`
-    <tr><td class="rtlabel">총 합계금액</td><td colspan="3" class="rttotal">${fmt(finalTotal)}</td></tr>
+    <tr><td class="rtlabel">총 합계금액</td><td colspan="3" class="rttotal">${fmt(final)}</td></tr>
     <tr><td class="rtlabel">거래처</td><td>${company}</td><td class="rtlabel">담당자</td><td>${name}</td></tr>
     <tr><td class="rtlabel">연락처</td><td>${phone}</td><td class="rtlabel">주소</td><td>${addr}</td></tr>`;
   let no=1;
-  const rows=items.map(it=>{
-    const up=quoteMode==='wholesale'?Math.round((it.cost||0)*(1+margin/100)):it.price;
-    const lp=up*it.qty;
-    return `<tr><td class="text-center">${no++}</td><td>${it.brand}</td><td>${it.name}</td><td class="text-center">${it.qty}</td><td class="text-right">${fmt(up)}</td><td class="text-right">${fmt(lp)}</td></tr>`;
-  }).join('');
+  const rows=items.map(it=>`<tr><td class="text-center">${no++}</td><td>${it.brand}</td><td>${it.name}</td><td class="text-center">${it.qty}</td><td class="text-right">${fmt(it.price)}</td><td class="text-right">${fmt(it.price*it.qty)}</td></tr>`).join('');
   let adjRows='';
-  if(quoteMode==='retail'){
-    if(discPct>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">할인 (${discPct}%)</td><td></td><td class="text-right" style="color:#c0392b;">-${fmt(discAmt)}</td></tr>`;
-    adjItems.forEach(a=>{if((a.value||0)>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">${a.label}</td><td></td><td class="text-right" style="color:${a.type==='minus'?'#c0392b':'#1a7a5e'};">${a.type==='minus'?'-':'+'}${fmt(a.value)}</td></tr>`;});
-  }
+  if(discPct>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">할인 (${discPct}%)</td><td></td><td class="text-right" style="color:#c0392b;">-${fmt(discAmt)}</td></tr>`;
+  if(marginPct>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">마진 (${marginPct}%)</td><td></td><td class="text-right" style="color:#1a7a5e;">+${fmt(marginAmt)}</td></tr>`;
+  adjItems.forEach(a=>{if((a.value||0)>0)adjRows+=`<tr><td class="text-center">-</td><td colspan="3">${a.label}</td><td></td><td class="text-right" style="color:${a.type==='minus'?'#c0392b':'#1a7a5e'};">${a.type==='minus'?'-':'+'}${fmt(a.value)}</td></tr>`;});
   document.getElementById('printItems').innerHTML=rows+adjRows;
-  document.getElementById('printFoot').innerHTML=`<tr style="font-weight:700;border-top:1.5px solid #333;"><td colspan="5" style="padding:8px;text-align:right;font-weight:700;">합 계</td><td class="text-right" style="padding:8px;font-size:14px;color:#1a7a5e;">${fmt(finalTotal)}</td></tr>`;
+  document.getElementById('printFoot').innerHTML=`<tr style="font-weight:700;border-top:1.5px solid #333;"><td colspan="5" style="padding:8px;text-align:right;font-weight:700;">합 계</td><td class="text-right" style="padding:8px;font-size:14px;color:#1a7a5e;">${fmt(final)}</td></tr>`;
   document.getElementById('printNote').textContent=note?'비고: '+note:'';
   switchTop('print');
   document.getElementById('printView').classList.add('active');
@@ -828,22 +871,52 @@ function chgCompareQty(id,d){
 function renderCompareSummary(){
   const items=Object.values(plans[currentPlan].selected);
   const el=document.getElementById('compareSummaryItems');
-  if(!items.length){el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div>';document.getElementById('compareTotal').textContent='₩0';return;}
-  let sub=0;
-  el.innerHTML=items.map(it=>{const lp=it.price*it.qty;sub+=lp;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join('');
-  document.getElementById('compareTotal').textContent=fmt(sub);
+  if(!items.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">선택된 항목이 없습니다</div>';
+    document.getElementById('compareTotal').textContent='₩0';
+    document.getElementById('cmpRetailRef').textContent='₩0';
+    document.getElementById('cmpStatRetail').textContent='₩0';
+    document.getElementById('cmpStatCost').textContent='₩0';
+    document.getElementById('cmpStatProfit').textContent='₩0';
+    document.getElementById('cmpStatMargin').textContent='0%';
+    return;
+  }
+  let sub=0,cost=0,retail=0;
+  el.innerHTML=items.map(it=>{const lp=it.price*it.qty;sub+=lp;cost+=(it.cost||0)*it.qty;retail+=it.price*it.qty;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join('');
+  const discPct=parseFloat(document.getElementById('cmpDiscountPct')?.value)||0;
+  const marginPct=parseFloat(document.getElementById('cmpMarginPct')?.value)||0;
+  const {final}=calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems);
+  const profit=final-cost;const rate=final>0?profit/final*100:0;
+  document.getElementById('compareTotal').textContent=fmt(final);
+  document.getElementById('cmpRetailRef').textContent=fmt(retail);
+  document.getElementById('cmpStatRetail').textContent=fmt(final);
+  document.getElementById('cmpStatCost').textContent=fmt(cost);
+  const pEl=document.getElementById('cmpStatProfit');
+  pEl.textContent=(profit>=0?'+':'')+fmt(profit);pEl.className='sval '+(profit>=0?'green':'red');
+  const mEl=document.getElementById('cmpStatMargin');
+  mEl.textContent=pct(rate);mEl.className='sval '+(rate>=0?'green':'red');
 }
 function renderCompareSlides(){
   const track=document.getElementById('compareTrack');
   const dots=document.getElementById('compareDots');
+  const discPct=parseFloat(document.getElementById('cmpDiscountPct')?.value)||0;
+  const marginPct=parseFloat(document.getElementById('cmpMarginPct')?.value)||0;
   track.innerHTML=PLAN_LABELS.map((l,i)=>{
     const items=Object.values(plans[i].selected);
-    let sub=0;
-    const rows=items.length?items.map(it=>{const lp=it.price*it.qty;sub+=lp;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">항목 없음</div>';
+    let sub=0,cost=0,retail=0;
+    const rows=items.length?items.map(it=>{const lp=it.price*it.qty;sub+=lp;cost+=(it.cost||0)*it.qty;retail+=it.price*it.qty;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">항목 없음</div>';
+    const {final}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems):{final:0};
+    const profit=final-cost;const rate=final>0?profit/final*100:0;
     return `<div class="compare-slide">
       <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
       ${rows}
-      ${items.length?`<div class="divider"></div><div class="total-row"><span style="font-size:13px;font-weight:700;">합계</span><span style="font-size:16px;font-weight:700;color:var(--green);">${fmt(sub)}</span></div>`:''}
+      ${items.length?`<div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);padding:2px 0;"><span>정가</span><span>${fmt(retail)}</span></div>
+      <div class="total-row"><span style="font-size:13px;font-weight:700;">최종</span><span style="font-size:15px;font-weight:700;color:var(--green);">${fmt(final)}</span></div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <div class="stat" style="flex:1;padding:6px 8px;"><div class="slabel">순이익</div><div class="sval ${profit>=0?'green':'red'}" style="font-size:12px;">${(profit>=0?'+':'')+fmt(profit)}</div></div>
+        <div class="stat" style="flex:1;padding:6px 8px;"><div class="slabel">수익률</div><div class="sval ${rate>=0?'green':'red'}" style="font-size:12px;">${pct(rate)}</div></div>
+      </div>`:''}
     </div>`;
   }).join('');
   dots.innerHTML=PLAN_LABELS.map((_,i)=>`<button class="compare-dot${i===compareSlide?' active':''}" onclick="goSlide(${i})"></button>`).join('');
@@ -1052,6 +1125,7 @@ function reloadSheets(){
 /* ══ INIT ══ */
 document.getElementById('quoteDate').value=todayStr();
 document.getElementById('discountPct').addEventListener('input',renderSummary);
+document.getElementById('wholesaleMargin').addEventListener('input',renderSummary);
 setTimeout(()=>document.getElementById('lockInput').focus(),100);
 loadFromSheets();
 </script>
