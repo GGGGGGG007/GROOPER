@@ -711,8 +711,8 @@ function calcFinal(subtotal, retailTotal, costTotal, discPct, marginPct, adjArr)
   const discAmt=Math.round(subtotal*discPct/100);
   const marginAmt=Math.round(costTotal*marginPct/100);
   let adjTotal=0;adjArr.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  // 할인은 소매가에서 차감, 마진은 원가에 추가, 둘 다 쓸 수 있음
-  const final=Math.max(0, subtotal - discAmt + marginAmt + adjTotal);
+  const base = marginPct>0 ? costTotal+marginAmt : subtotal-discAmt;
+  const final=Math.max(0, base+adjTotal);
   return {final, discAmt, marginAmt, adjTotal};
 }
 
@@ -888,7 +888,6 @@ function renderCompareSummary(){
   const marginPct=parseFloat(document.getElementById('cmpMarginPct')?.value)||0;
   const {final}=calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems);
   // 수익률은 추가항목 제외한 현금가 기준
-  const cmpBase=marginPct>0?cost:sub;
   const {final:cashPrice}=calcFinal(sub,retail,cost,discPct,marginPct,[]);
   const profit=cashPrice-cost;const rate=cashPrice>0?profit/cashPrice*100:0;
   document.getElementById('compareTotal').textContent=fmt(final);
@@ -912,7 +911,7 @@ function renderCompareSlides(){
     const {final}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems):{final:0};
     const {final:cashPrice}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,[]):{final:0};
     const profit=cashPrice-cost;
-    const rate=cashPrice>0?(cashPrice-cost)/cashPrice*100:0;
+    const rate=cashPrice>0?profit/cashPrice*100:0;
     return `<div class="compare-slide">
       <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
       ${rows}
