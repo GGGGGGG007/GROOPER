@@ -711,9 +711,8 @@ function calcFinal(subtotal, retailTotal, costTotal, discPct, marginPct, adjArr)
   const discAmt=Math.round(subtotal*discPct/100);
   const marginAmt=Math.round(costTotal*marginPct/100);
   let adjTotal=0;adjArr.forEach(a=>{adjTotal+=(a.type==='plus'?1:-1)*(a.value||0);});
-  // 마진 모드면 원가 기준, 할인 모드면 소매가 기준
-  const base = marginPct>0 ? costTotal : subtotal;
-  const final=Math.max(0, base - discAmt + marginAmt + adjTotal);
+  // 할인은 소매가에서 차감, 마진은 원가에 추가, 둘 다 쓸 수 있음
+  const final=Math.max(0, subtotal - discAmt + marginAmt + adjTotal);
   return {final, discAmt, marginAmt, adjTotal};
 }
 
@@ -742,9 +741,8 @@ function renderSummary(){
   const mgnLbl=document.getElementById('marginAmtLabel');
   if(mgnLbl)mgnLbl.textContent=marginPct>0?`+${fmt(marginAmt)}`:'';
 
-  // 수익률은 추가항목 제외한 현금가 기준
-  const base = marginPct>0 ? totalCost : subtotal;
-  const cashPrice = Math.max(0, base - discAmt + marginAmt);
+  // 현금가 = 추가항목 제외한 판매가
+  const {final:cashPrice}=calcFinal(subtotal,retailTotal,totalCost,discPct,marginPct,[]);
   const profit=cashPrice-totalCost;
   const rate=cashPrice>0?profit/cashPrice*100:0;
 
@@ -913,7 +911,8 @@ function renderCompareSlides(){
     const rows=items.length?items.map(it=>{const lp=it.price*it.qty;sub+=lp;cost+=(it.cost||0)*it.qty;retail+=it.price*it.qty;return `<div class="sum-row"><span class="sum-label">${it.name}</span><span class="sum-qty">×${it.qty}</span><span class="sum-price">${fmt(lp)}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px 0;">항목 없음</div>';
     const {final}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,cmpAdjItems):{final:0};
     const {final:cashPrice}=items.length?calcFinal(sub,retail,cost,discPct,marginPct,[]):{final:0};
-    const profit=cashPrice-cost;const rate=cashPrice>0?profit/cashPrice*100:0;
+    const profit=cashPrice-cost;
+    const rate=cashPrice>0?(cashPrice-cost)/cashPrice*100:0;
     return `<div class="compare-slide">
       <div style="margin-bottom:8px;"><span class="plan-badge">${l}안</span></div>
       ${rows}
